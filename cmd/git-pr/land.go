@@ -79,7 +79,7 @@ func (l *landCmd) Execute(args []string) error {
 	}
 
 	prs, _, err = cfg.GitHub().PullRequests.List(repo.Owner, repo.Name,
-		&github.PullRequestListOptions{Base: repo.Owner + ":" + branch})
+		&github.PullRequestListOptions{Base: branch})
 	if err == nil && len(prs) == 0 {
 		// TODO: if len(prs) > 0, maybe we should rebase those PRs on master
 		if _, err := cfg.GitHub().Git.DeleteRef(repo.Owner, repo.Name, "heads/"+branch); err != nil {
