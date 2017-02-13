@@ -69,11 +69,10 @@ func (l *landCmd) Execute(args []string) error {
 
 	log.Println("Landing", pr.URL(pull))
 
-	lander := &pr.MessageEditLander{
+	lander := &pr.InteractiveLander{
 		Editor: editor,
-		Lander: &pr.SquashLander{GitHubClient: cfg.GitHub()},
+		Pulls:  cfg.GitHub().PullRequests,
 	}
-
 	if err := lander.Land(pull); err != nil {
 		return fmt.Errorf("Could not land %v: %v", pr.URL(pull), err)
 	}
@@ -81,6 +80,7 @@ func (l *landCmd) Execute(args []string) error {
 	prs, _, err = cfg.GitHub().PullRequests.List(repo.Owner, repo.Name,
 		&github.PullRequestListOptions{Base: branch})
 	if err == nil && len(prs) == 0 {
+		log.Printf("Deleting remote branch %q\n", branch)
 		// TODO: if len(prs) > 0, maybe we should rebase those PRs on master
 		if _, err := cfg.GitHub().Git.DeleteRef(repo.Owner, repo.Name, "heads/"+branch); err != nil {
 			return fmt.Errorf("could not delete remote branch %q: %v", branch, err)
