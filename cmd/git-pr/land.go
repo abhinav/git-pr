@@ -85,8 +85,14 @@ func (l *landCmd) Execute(args []string) error {
 		if _, err := cfg.GitHub().Git.DeleteRef(repo.Owner, repo.Name, "heads/"+branch); err != nil {
 			return fmt.Errorf("could not delete remote branch %q: %v", branch, err)
 		}
+
+		if err := git.Run("branch", "-dr", "origin/"+branch); err != nil {
+			return fmt.Errorf("failed to delete remote tracking branch %q: %v", branch, err)
+		}
 	}
 
+	// We delete the local branch only if it was automatically determined
+	// to be the current branch.
 	if deleteLocalBranch {
 		if err := git.Run("checkout", *pull.Base.Ref); err != nil {
 			return fmt.Errorf("could not switch to loca branch %v: %v", *pull.Base.Ref, err)
