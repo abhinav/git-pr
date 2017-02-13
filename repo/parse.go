@@ -25,6 +25,5 @@ func Parse(value string) (*entity.Repo, error) {
 		return nil, fmt.Errorf("name in repository %q cannot be empty", value)
 	}
 
-	fmt.Printf("Using repo %v:%v\n", owner, name)
 	return &entity.Repo{Owner: owner, Name: name}, nil
 }

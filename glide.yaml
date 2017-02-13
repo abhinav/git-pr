@@ -5,3 +5,4 @@ import:
   - github
 - package: golang.org/x/oauth2
 - package: github.com/jessevdk/go-flags
+- package: github.com/zalando/go-keyring
