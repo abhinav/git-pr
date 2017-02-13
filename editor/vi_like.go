@@ -60,10 +60,10 @@ func (vi *ViLike) EditString(in string) (string, error) {
 	// will be retained.
 	cmd := exec.Command(
 		vi.path,
-		"-c", "%d", // delete the placeholder
-		"-c", "0read "+sourceFile, // read the source file in-place
+		"-c", "%d", // delete placeholder
+		"-c", "0read "+sourceFile, // read the source file
 		"-c", "$d", // delete trailing newline
-		"-c", "set ft=gitcommit",
+		"-c", "set ft=gitcommit | 0", // set filetype and go to start of file
 		destFile)
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
