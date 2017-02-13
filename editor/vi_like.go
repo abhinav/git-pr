@@ -63,6 +63,7 @@ func (vi *ViLike) EditString(in string) (string, error) {
 		"-c", "%d", // delete the placeholder
 		"-c", "0read "+sourceFile, // read the source file in-place
 		"-c", "$d", // delete trailing newline
+		"-c", "set ft=gitcommit",
 		destFile)
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
