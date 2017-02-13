@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/abhinav/git-fu/entity"
 	"github.com/abhinav/git-fu/repo"
 
 	"github.com/google/go-github/github"
@@ -18,7 +17,7 @@ const _keyringServiceName = "git-fu"
 
 // Config is the common configuration for all programs in this package.
 type Config interface {
-	Repo() *entity.Repo
+	Repo() *repo.Repo
 	GitHub() *github.Client
 }
 
@@ -31,7 +30,7 @@ type globalConfig struct {
 	GitHubToken string `short:"t" long:"token" env:"GITHUB_TOKEN" value-name:"TOKEN" description:"GitHub token used to make requests."`
 
 	token        string
-	repo         *entity.Repo
+	repo         *repo.Repo
 	httpClient   *http.Client
 	githubClient *github.Client
 }
@@ -103,7 +102,7 @@ func (g *globalConfig) Build() (_ Config, err error) {
 	return g, nil
 }
 
-func (g *globalConfig) Repo() *entity.Repo {
+func (g *globalConfig) Repo() *repo.Repo {
 	return g.repo
 }
 

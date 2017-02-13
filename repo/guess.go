@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/abhinav/git-fu/entity"
 	"github.com/abhinav/git-fu/git"
 )
 
@@ -15,7 +14,7 @@ const (
 )
 
 // Guess determines the Repo name based on the current Git repository's remotes.
-func Guess(dir string) (*entity.Repo, error) {
+func Guess(dir string) (*Repo, error) {
 	newDir, err := filepath.Abs(dir)
 	if err != nil {
 		return nil, fmt.Errorf("could not resolve absolute path to %q: %v", dir, err)

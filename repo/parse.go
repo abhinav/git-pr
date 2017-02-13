@@ -4,12 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/abhinav/git-fu/entity"
 )
 
 // Parse parses a repository name in the format 'owner/repo'.
-func Parse(value string) (*entity.Repo, error) {
+func Parse(value string) (*Repo, error) {
 	parts := strings.Split(value, "/")
 	if len(parts) != 2 {
 		return nil, errors.New("repository must be in the form owner/repo")
@@ -25,5 +23,5 @@ func Parse(value string) (*entity.Repo, error) {
 		return nil, fmt.Errorf("name in repository %q cannot be empty", value)
 	}
 
-	return &entity.Repo{Owner: owner, Name: name}, nil
+	return &Repo{Owner: owner, Name: name}, nil
 }
