@@ -25,8 +25,10 @@ Only one subcommand at this time: `land`. This does a few things:
 -   Rebases pull requests that depend on the merged pull request against its
     base and changes their merge base on GitHub to that branch
 
-    git pr land
-    git pr land mybranch
+```
+git pr land
+git pr land mybranch
+```
 
 In pictures, given the layout,
 
