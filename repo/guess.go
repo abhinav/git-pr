@@ -2,10 +2,9 @@ package repo
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
-	"github.com/abhinav/git-fu/git"
+	"github.com/abhinav/git-fu/gateway"
 )
 
 const (
@@ -14,18 +13,11 @@ const (
 )
 
 // Guess determines the Repo name based on the current Git repository's remotes.
-func Guess(dir string) (*Repo, error) {
-	newDir, err := filepath.Abs(dir)
-	if err != nil {
-		return nil, fmt.Errorf("could not resolve absolute path to %q: %v", dir, err)
-	}
-	dir = newDir
-
-	url, err := git.Output("remote", "get-url", "origin")
+func Guess(git gateway.Git) (*Repo, error) {
+	url, err := git.RemoteURL("origin")
 	if err != nil {
 		return nil, err
 	}
-	url = strings.TrimSpace(url)
 
 	switch {
 	case strings.HasPrefix(url, sshRemotePrefix):
@@ -33,8 +25,7 @@ func Guess(dir string) (*Repo, error) {
 	case strings.HasPrefix(url, httpRemotePrefix):
 		url = url[len(httpRemotePrefix):]
 	default:
-		return nil, fmt.Errorf(
-			`remote "origin" (%v) of %q is not a GitHub remote`, url, dir)
+		return nil, fmt.Errorf(`remote "origin" (%v) is not a GitHub remote`, url)
 	}
 
 	return Parse(strings.TrimSuffix(url, ".git"))

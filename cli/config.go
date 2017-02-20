@@ -3,12 +3,14 @@ package cli
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 
+	"github.com/abhinav/git-fu/gateway"
+	"github.com/abhinav/git-fu/git"
+	"github.com/abhinav/git-fu/github"
 	"github.com/abhinav/git-fu/repo"
 
-	"github.com/google/go-github/github"
+	gh "github.com/google/go-github/github"
 	"github.com/zalando/go-keyring"
 	"golang.org/x/oauth2"
 )
@@ -17,8 +19,9 @@ const _keyringServiceName = "git-fu"
 
 // Config is the common configuration for all programs in this package.
 type Config interface {
+	Git() gateway.Git
 	Repo() *repo.Repo
-	GitHub() *github.Client
+	GitHub() gateway.GitHub
 }
 
 // ConfigBuilder builds a configuration lazily.
@@ -29,13 +32,23 @@ type globalConfig struct {
 	GitHubUser  string `short:"u" long:"user" value-name:"USERNAME" env:"GITHUB_USER" required:"yes" description:"GitHub username."`
 	GitHubToken string `short:"t" long:"token" env:"GITHUB_TOKEN" value-name:"TOKEN" description:"GitHub token used to make requests."`
 
-	token        string
-	repo         *repo.Repo
-	httpClient   *http.Client
-	githubClient *github.Client
+	token  string
+	repo   *repo.Repo
+	git    gateway.Git
+	github gateway.GitHub
 }
 
 var _ Config = (*globalConfig)(nil)
+
+func (g *globalConfig) buildGit() (gateway.Git, error) {
+	if g.git != nil {
+		return g.git, nil
+	}
+
+	var err error
+	g.git, err = git.NewGateway("")
+	return g.git, err
+}
 
 func (g *globalConfig) Token() (string, error) {
 	switch {
@@ -82,10 +95,15 @@ func (g *globalConfig) askForToken() (string, error) {
 
 // globalConfig.Build is a ConfigBuilder
 func (g *globalConfig) Build() (_ Config, err error) {
+	git, err := g.buildGit()
+	if err != nil {
+		return nil, err
+	}
+
 	if g.RepoName != "" {
 		g.repo, err = repo.Parse(g.RepoName)
 	} else {
-		g.repo, err = repo.Guess(".")
+		g.repo, err = repo.Guess(git)
 	}
 	if err != nil {
 		return nil, err
@@ -97,8 +115,8 @@ func (g *globalConfig) Build() (_ Config, err error) {
 	}
 
 	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-	g.httpClient = oauth2.NewClient(context.Background(), tokenSource)
-	g.githubClient = github.NewClient(g.httpClient)
+	httpClient := oauth2.NewClient(context.Background(), tokenSource)
+	g.github = github.NewGatewayForRepository(gh.NewClient(httpClient), g.repo)
 	return g, nil
 }
 
@@ -106,6 +124,10 @@ func (g *globalConfig) Repo() *repo.Repo {
 	return g.repo
 }
 
-func (g *globalConfig) GitHub() *github.Client {
-	return g.githubClient
+func (g *globalConfig) GitHub() gateway.GitHub {
+	return g.github
+}
+
+func (g *globalConfig) Git() gateway.Git {
+	return g.git
 }
