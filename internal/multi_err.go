@@ -27,13 +27,6 @@ func indentTail(spaces int, s string) string {
 //
 // Returns nil if the error list is empty.
 func MultiError(errors ...error) error {
-	switch len(errors) {
-	case 0:
-		return nil
-	case 1:
-		return errors[0]
-	}
-
 	newErrors := make(multiError, 0, len(errors))
 	for _, err := range errors {
 		if err == nil {
@@ -47,5 +40,12 @@ func MultiError(errors ...error) error {
 		}
 	}
 
-	return multiError(newErrors)
+	switch len(newErrors) {
+	case 0:
+		return nil
+	case 1:
+		return newErrors[0]
+	}
+
+	return newErrors
 }
