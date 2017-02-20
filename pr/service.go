@@ -88,22 +88,26 @@ func (s *Service) Land(req *LandRequest) error {
 		return err
 	}
 
-	// No dependents. Delete the remote branch and the local tracking branch
-	// for it.
-	if len(dependents) == 0 {
-		if err := s.GitHub.DeleteBranch(*pr.Head.Ref); err != nil {
-			return err
-		}
-
-		if req.LocalBranch != "" {
-			// TODO: Remove hard coded remote name
-			if err := s.Git.DeleteRemoteTrackingBranch("origin", req.LocalBranch); err != nil {
-				return err
-			}
+	if len(dependents) > 0 {
+		if err := s.rebaseAll(base, dependents); err != nil {
+			return fmt.Errorf("failed to rebase dependents of %v: %v", *pr.HTMLURL, err)
 		}
 	}
 
-	return s.rebaseAll(base, dependents)
+	// TODO: What happens on branch deletion if we had dependents but none
+	// were owned by us?
+	if err := s.GitHub.DeleteBranch(*pr.Head.Ref); err != nil {
+		return err
+	}
+
+	if req.LocalBranch != "" {
+		// TODO: Remove hard coded remote name
+		if err := s.Git.DeleteRemoteTrackingBranch("origin", req.LocalBranch); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Rebase all of the given pull requests onto the given base branch.
@@ -174,6 +178,10 @@ func (s *Service) rebaseOnto(base string, pr *github.PullRequest) (err error) {
 	if err := s.GitHub.SetPullRequestBase(*pr.Number, base); err != nil {
 		return err
 	}
+
+	// TODO: If this worked out, we should probably reset the local branch for
+	// this PR (if any) to the new head. Maybe by verifying a SHA before
+	// rebasing.
 
 	// If this PR had any dependents, rebase them onto its new head.
 	dependents, err := s.GitHub.ListPullRequestsByBase(*pr.Head.Ref)
