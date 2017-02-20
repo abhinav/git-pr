@@ -1,12 +1,16 @@
-hash: ed59f4bfdad8a8bc389758826bbaf2f48ffe43dd26b1ac4e8cda9397543a5b69
-updated: 2017-02-12T16:49:58.084691069-08:00
+hash: 4f48d3c67ae4cd3ea0bbd6aa217638abc2a6f9c132d22debb94ed1857d3b308b
+updated: 2017-02-19T16:25:02.258658367-08:00
 imports:
+- name: github.com/danieljoos/wincred
+  version: cbe0c0023057b04ad78c6de5e8cb85ea9b5315be
+- name: github.com/godbus/dbus
+  version: 4b24ebee04561bf8a3bcc09aead82062edc56778
 - name: github.com/golang/protobuf
   version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
   - proto
 - name: github.com/google/go-github
-  version: b272bb85ab53b610b5660988998feb0e0294bd2b
+  version: 2ec691a35b10b8c1471955a96d0f182a572e1cad
   subpackages:
   - github
 - name: github.com/google/go-querystring
@@ -17,8 +21,10 @@ imports:
   version: 0648c820cd4e564706597268ae2d2c7d9e6900c6
 - name: github.com/zalando/go-keyring
   version: e59fa393797e20dbc53303e827941e5bf8eadda1
+  subpackages:
+  - secret_service
 - name: golang.org/x/net
-  version: 0e2717dc3cc05907dc23096ef3a9086ea93f567f
+  version: b400c2eff1badec7022a8c8f5bea058b6315eed7
   subpackages:
   - context
 - name: golang.org/x/oauth2
