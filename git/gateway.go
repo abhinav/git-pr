@@ -64,7 +64,7 @@ func (g *Gateway) CurrentBranch() (string, error) {
 
 // DoesBranchExist checks if this branch exists locally.
 func (g *Gateway) DoesBranchExist(name string) bool {
-	err := g.cmd("show-ref", "refs/heads/"+name).Run()
+	err := g.cmd("show-ref", "--verify", "--quiet", "refs/heads/"+name).Run()
 	return err == nil
 }
 
