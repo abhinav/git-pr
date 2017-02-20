@@ -48,10 +48,10 @@ Running,
 The resulting layout will look like so,
 
     o--o--o master'
-        \
-         o---o feature1
-              \
-               o---o feature3
+           \
+            o---o feature1
+                 \
+                  o---o feature3
 
       master' = master + feature2
 
