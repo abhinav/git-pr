@@ -1,7 +1,7 @@
 Releases
 ========
 
-v0.2.0 (unreleased)
+v0.2.0 (2017-02-21)
 -------------------
 
 -   Added `rebase` subcommand to `git pr`.
