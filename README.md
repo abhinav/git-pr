@@ -14,7 +14,16 @@ The following commands have been implemented so far.
 `git-pr`
 --------
 
-Only one subcommand at this time: `land`. This does a few things:
+The following subcommands are provided:
+
+### `land`
+
+```
+git pr land
+git pr land mybranch
+```
+
+This does a few things:
 
 -   Squash-merges a specific pull request, defaulting to the pull request made
     with the current branch
@@ -22,15 +31,10 @@ Only one subcommand at this time: `land`. This does a few things:
     PR title and body for the commit message
 -   Pulls the merge base
 -   Performs post-merge cleanup like deleting local and remote branches
--   Rebases pull requests that depend on the merged pull request against its
-    base and changes their merge base on GitHub to that branch
+-   Rebases PRs that depend on the merged pull request; see the `rebase`
+    command for more information
 
-```
-git pr land
-git pr land mybranch
-```
-
-In pictures, given the layout,
+Given the layout,
 
          o---o feature2
         /
@@ -68,10 +72,19 @@ Will result in,
 
       master'' = master' + feature1
 
-Rebasing dependent pull requests is intended to work across multiple levels.
-PRs that depend on rebased PRs will also be rebased. For example, given,
+### `rebase`
 
-    o---o master
+```
+git pr rebase --onto master
+git pr rebase --onto master mybranch
+```
+
+Rebases the pull request for this branch onto the given base branch, also
+rebasing any dependent branches for that PR onto the new head of this PR.
+
+Given the layout,
+
+    o---o---o master
          \
           o feature1
            \
@@ -79,15 +92,21 @@ PRs that depend on rebased PRs will also be rebased. For example, given,
              \
               o--o feature3
 
-Landing feature1 will result in,
+Running,
 
-    o---o---o master'
+    $ git checkout feature1
+    $ git pr rebase --onto master
+
+Will result in,
+
+    o---o---o master
              \
-              o--o--o feature2
+              o feature1
                \
-                o--o feature3
+                o--o--o feature2
+                 \
+                  o--o feature3
 
-      master' = master + feature1
 
 Code organization
 =================

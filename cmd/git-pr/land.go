@@ -36,8 +36,8 @@ func (l *landCmd) Execute(args []string) error {
 		return err
 	}
 
-	var req pr.LandRequest
-	svc := pr.Service{GitHub: cfg.GitHub(), Git: cfg.Git(), Editor: editor}
+	req := pr.LandRequest{Editor: editor}
+	svc := pr.Service{GitHub: cfg.GitHub(), Git: cfg.Git()}
 
 	// TODO: accept other inputs for the PR to land
 	branch := l.Args.Branch

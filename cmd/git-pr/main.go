@@ -10,5 +10,10 @@ func main() {
 			ShortDesc: "Lands a GitHub PR.",
 			Build:     newLandCommand,
 		},
+		&cli.Command{
+			Name:      "rebase",
+			ShortDesc: "Rebases a PR branch.",
+			Build:     newRebaseCommand,
+		},
 	)
 }
