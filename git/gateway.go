@@ -209,6 +209,25 @@ func (g *Gateway) Rebase(req *gateway.RebaseRequest) error {
 	return nil
 }
 
+// ResetBranch resets the given branch to the given head.
+func (g *Gateway) ResetBranch(branch, head string) error {
+	curr, err := g.CurrentBranch()
+	if err != nil {
+		return fmt.Errorf("could not reset %q to %q: %v", branch, head, err)
+	}
+
+	if curr == branch {
+		err = g.cmd("reset", "--hard", head).Run()
+	} else {
+		err = g.cmd("branch", "-f", branch, head).Run()
+	}
+
+	if err != nil {
+		err = fmt.Errorf("could not reset %q to %q: %v", branch, head, err)
+	}
+	return err
+}
+
 // RemoteURL gets the URL for the given remote.
 func (g *Gateway) RemoteURL(name string) (string, error) {
 	out, err := g.output("remote", "get-url", name)

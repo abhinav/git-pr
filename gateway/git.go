@@ -69,6 +69,9 @@ type Git interface {
 	// Rebase a branch
 	Rebase(*RebaseRequest) error
 
+	// Reset the given branch to the given head.
+	ResetBranch(branch, head string) error
+
 	// Get the SHA1 hash for the given ref.
 	SHA1(ref string) (string, error)
 

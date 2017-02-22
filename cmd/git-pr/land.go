@@ -64,8 +64,17 @@ func (l *landCmd) Execute(args []string) error {
 	}
 
 	log.Println("Landing", *req.PullRequest.HTMLURL)
-	if err := svc.Land(&req); err != nil {
+	res, err := svc.Land(&req)
+	if err != nil {
 		return fmt.Errorf("failed to land %v: %v", *req.PullRequest.HTMLURL, err)
+	}
+
+	if len(res.BranchesNotUpdated) > 0 {
+		log.Println("The following local branches were not updated because " +
+			"they did not match the corresponding remotes")
+		for _, br := range res.BranchesNotUpdated {
+			log.Println(" -", br)
+		}
 	}
 	return nil
 }

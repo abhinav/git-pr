@@ -19,20 +19,27 @@ type RebaseRequest struct {
 	Base         string
 }
 
+// RebaseResponse is the response of the Rebase operation.
+type RebaseResponse struct {
+	// Local branches that were not updated because their heads did not match
+	// the remotes.
+	BranchesNotUpdated []string
+}
+
 // Rebase a pull request and its dependencies.
-func (s *Service) Rebase(req *RebaseRequest) (err error) {
+func (s *Service) Rebase(req *RebaseRequest) (_ *RebaseResponse, err error) {
 	if err := s.Git.Fetch(&gateway.FetchRequest{Remote: "origin"}); err != nil {
-		return err
+		return nil, err
 	}
 
 	baseRef, err := s.Git.SHA1("origin/" + req.Base)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	result, err := dryRebase(s, baseRef, req.PullRequests)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() {
 		for _, r := range result {
@@ -40,9 +47,23 @@ func (s *Service) Rebase(req *RebaseRequest) (err error) {
 		}
 	}()
 
-	pushRefs := make(map[string]string)
+	var (
+		// These branches will be reset locally after pushing.
+		branchesToReset []string
+		// Branches not updated because their heads were out of date
+		BranchesNotUpdated []string
+		pushRefs           = make(map[string]string)
+	)
 	for _, r := range result {
-		pushRefs[r.LocalBranch] = *r.PullRequest.Head.Ref
+		head := *r.PullRequest.Head
+		if sha, err := s.Git.SHA1(*head.Ref); err == nil {
+			if sha == *head.SHA {
+				branchesToReset = append(branchesToReset, *head.Ref)
+			} else {
+				BranchesNotUpdated = append(BranchesNotUpdated, *head.Ref)
+			}
+		}
+		pushRefs[r.LocalBranch] = *head.Ref
 	}
 
 	if err := s.Git.PushMany(&gateway.PushManyRequest{
@@ -50,13 +71,19 @@ func (s *Service) Rebase(req *RebaseRequest) (err error) {
 		Force:  true,
 		Refs:   pushRefs,
 	}); err != nil {
-		return err
+		return nil, err
+	}
+
+	var errors []error
+	for _, br := range branchesToReset {
+		if err := s.Git.ResetBranch(br, "origin/"+br); err != nil {
+			errors = append(errors, fmt.Errorf("failed to update branch %q: %v", br, err))
+		}
 	}
 
 	var (
-		mu     sync.Mutex
-		wg     sync.WaitGroup
-		errors []error
+		mu sync.Mutex
+		wg sync.WaitGroup
 	)
 	for _, pr := range req.PullRequests {
 		if *pr.Base.Ref != req.Base {
@@ -77,7 +104,9 @@ func (s *Service) Rebase(req *RebaseRequest) (err error) {
 	}
 	wg.Wait()
 
-	return internal.MultiError(errors...)
+	return &RebaseResponse{
+		BranchesNotUpdated: BranchesNotUpdated,
+	}, internal.MultiError(errors...)
 }
 
 type rebasedPullRequest struct {

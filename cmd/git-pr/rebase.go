@@ -57,5 +57,17 @@ func (r *rebaseCmd) Execute(args []string) error {
 		}
 	}
 
-	return svc.Rebase(&pr.RebaseRequest{PullRequests: prs, Base: r.Base})
+	res, err := svc.Rebase(&pr.RebaseRequest{PullRequests: prs, Base: r.Base})
+	if err != nil {
+		return err
+	}
+
+	if len(res.BranchesNotUpdated) > 0 {
+		log.Println("The following local branches were not updated because " +
+			"they did not match the corresponding remotes")
+		for _, br := range res.BranchesNotUpdated {
+			log.Println(" -", br)
+		}
+	}
+	return nil
 }

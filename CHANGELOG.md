@@ -1,6 +1,13 @@
 Releases
 ========
 
+v0.3.0 (unreleased)
+-------------------
+
+-   `git pr rebase` now resets local branches when their remotes get updated
+    but only if their heads matched the remotes at the time of rebase.
+
+
 v0.2.2 (2017-02-22)
 -------------------
 
