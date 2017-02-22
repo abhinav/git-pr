@@ -2,6 +2,7 @@ package pr
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/abhinav/git-fu/gateway"
 	"github.com/abhinav/git-fu/internal"
@@ -10,13 +11,16 @@ import (
 
 // RebaseRequest is a request to rebase the given list of pull requests and
 // their dependencies onto the given base branch.
+//
+// If the base branch for the given PRs on GitHub is not the same as Base,
+// this will be updated too.
 type RebaseRequest struct {
 	PullRequests []*github.PullRequest
 	Base         string
 }
 
 // Rebase a pull request and its dependencies.
-func (s *Service) Rebase(req *RebaseRequest) error {
+func (s *Service) Rebase(req *RebaseRequest) (err error) {
 	if err := s.Git.Fetch(&gateway.FetchRequest{Remote: "origin"}); err != nil {
 		return err
 	}
@@ -30,29 +34,48 @@ func (s *Service) Rebase(req *RebaseRequest) error {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		for _, r := range result {
+			err = internal.MultiError(err, s.Git.DeleteBranch(r.LocalBranch))
+		}
+	}()
 
-	var errors []error
+	pushRefs := make(map[string]string)
 	for _, r := range result {
-		err := s.Git.Push(&gateway.PushRequest{
-			Remote:    "origin",
-			LocalRef:  r.LocalBranch,
-			RemoteRef: *r.PullRequest.Head.Ref,
-			Force:     true,
-		})
-		if err != nil {
-			errors = append(errors, fmt.Errorf(
-				"failed to push update for %v: %v", *r.PullRequest.HTMLURL, err))
-		}
-
-		if *r.PullRequest.Base.Ref != req.Base {
-			if err := s.GitHub.SetPullRequestBase(*r.PullRequest.Number, req.Base); err != nil {
-				errors = append(errors, err)
-			}
-		}
-
-		// TODO: If we had a local branch for this PR, update it too
-		errors = append(errors, s.Git.DeleteBranch(r.LocalBranch))
+		pushRefs[r.LocalBranch] = *r.PullRequest.Head.Ref
 	}
+
+	if err := s.Git.PushMany(&gateway.PushManyRequest{
+		Remote: "origin",
+		Force:  true,
+		Refs:   pushRefs,
+	}); err != nil {
+		return err
+	}
+
+	var (
+		mu     sync.Mutex
+		wg     sync.WaitGroup
+		errors []error
+	)
+	for _, pr := range req.PullRequests {
+		if *pr.Base.Ref != req.Base {
+			wg.Add(1)
+			go func(pr *github.PullRequest) {
+				defer wg.Done()
+				err := s.GitHub.SetPullRequestBase(*pr.Number, req.Base)
+				if err == nil {
+					return
+				}
+
+				mu.Lock()
+				errors = append(errors, fmt.Errorf(
+					"failed to set base for %v to %q", *pr.HTMLURL, req.Base))
+				mu.Unlock()
+			}(pr)
+		}
+	}
+	wg.Wait()
 
 	return internal.MultiError(errors...)
 }

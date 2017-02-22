@@ -1,10 +1,19 @@
 Releases
 ========
 
+v0.2.2 (unreleased)
+-------------------
+
+-   `git pr rebase`: Use a single `git push` command rather than multiple when
+    updating remote refs. This should significantly speed things up.
+-   Fixed bug in `git pr rebase` that would cause the base branches for all PRs
+    to be changed to the given base branch rather than just the first level.
+
+
 v0.2.1 (2017-02-21)
 -------------------
 
--   Fix bug in `git pr rebase` where commits from old rebased bases were
+-   Fixed bug in `git pr rebase` where commits from old rebased bases were
     leaking into higher level branches.
 -   `git pr rebase` now stages all rebase changes locally on temporary branches
     before pushing them to the remotes. This way, no actual changes are made

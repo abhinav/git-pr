@@ -135,19 +135,34 @@ func (g *Gateway) Fetch(req *gateway.FetchRequest) error {
 
 // Push a branch
 func (g *Gateway) Push(req *gateway.PushRequest) error {
-	ref := req.LocalRef
-	if req.RemoteRef != "" {
-		ref = ref + ":" + req.RemoteRef
+	err := g.PushMany(&gateway.PushManyRequest{
+		Remote: req.Remote,
+		Force:  req.Force,
+		Refs:   map[string]string{req.LocalRef: req.RemoteRef},
+	})
+	if err != nil {
+		err = fmt.Errorf("failed to push %q to %q: %v", req.LocalRef, req.Remote, err)
 	}
+	return err
+}
 
-	args := []string{"push"}
+// PushMany pushes multiple refs to a remote
+func (g *Gateway) PushMany(req *gateway.PushManyRequest) error {
+	args := append(make([]string, 0, len(req.Refs)+2), "push")
 	if req.Force {
 		args = append(args, "-f")
 	}
-	args = append(args, req.Remote, ref)
+	args = append(args, req.Remote)
+
+	for ref, remote := range req.Refs {
+		if remote != "" {
+			ref = ref + ":" + remote
+		}
+		args = append(args, ref)
+	}
 
 	if err := g.cmd(args...).Run(); err != nil {
-		return fmt.Errorf("failed to push %q to %q: %v", ref, req.Remote, err)
+		return fmt.Errorf("failed to push refs to %q: %v", req.Remote, err)
 	}
 	return nil
 }

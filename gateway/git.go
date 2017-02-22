@@ -15,6 +15,15 @@ type PushRequest struct {
 	Force     bool
 }
 
+// PushManyRequest is a request to push many refs in one go.
+type PushManyRequest struct {
+	Remote string
+	// Mapping of local ref to remote ref. Remote ref may be empty to indicate
+	// that the local ref name should be used.
+	Refs  map[string]string
+	Force bool
+}
+
 // RebaseRequest is a request to perform a Git rebase.
 type RebaseRequest struct {
 	Onto   string // --onto
@@ -53,6 +62,9 @@ type Git interface {
 
 	// Push a branch
 	Push(*PushRequest) error
+
+	// Push many branches
+	PushMany(*PushManyRequest) error
 
 	// Rebase a branch
 	Rebase(*RebaseRequest) error
