@@ -1,7 +1,7 @@
 Releases
 ========
 
-v0.2.2 (unreleased)
+v0.2.2 (2017-02-22)
 -------------------
 
 -   `git pr rebase`: Use a single `git push` command rather than multiple when
