@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/abhinav/git-fu/editor"
+
 	"github.com/google/go-github/github"
 )
 

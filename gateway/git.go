@@ -15,6 +15,13 @@ type PushRequest struct {
 	Force     bool
 }
 
+// RebaseRequest is a request to perform a Git rebase.
+type RebaseRequest struct {
+	Onto   string // --onto
+	From   string // if provided, we diff against this ref
+	Branch string // branch to rebase
+}
+
 // TODO: All operations can automatically be scoped to a single remote.
 
 // Git is a gateway to access git locally.
@@ -46,6 +53,9 @@ type Git interface {
 
 	// Push a branch
 	Push(*PushRequest) error
+
+	// Rebase a branch
+	Rebase(*RebaseRequest) error
 
 	// Get the SHA1 hash for the given ref.
 	SHA1(ref string) (string, error)

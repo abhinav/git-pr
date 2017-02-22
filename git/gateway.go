@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/abhinav/git-fu/gateway"
+	"github.com/abhinav/git-fu/internal"
 )
 
 // Gateway is a git gateway.
@@ -68,7 +69,8 @@ func (g *Gateway) DoesBranchExist(name string) bool {
 	return err == nil
 }
 
-// CreateBranch creates
+// CreateBranch creates a branch with the given name and head but does not
+// check it out.
 func (g *Gateway) CreateBranch(name, head string) error {
 	if err := g.cmd("branch", name, head).Run(); err != nil {
 		return fmt.Errorf("failed to create branch %q at ref %q: %v", name, head, err)
@@ -164,6 +166,30 @@ func (g *Gateway) ApplyPatches(patches string) error {
 	cmd.Stdin = strings.NewReader(patches)
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to apply patches: %v", err)
+	}
+	return nil
+}
+
+// Rebase a branch.
+func (g *Gateway) Rebase(req *gateway.RebaseRequest) error {
+	var _args [5]string
+
+	args := append(_args[:0], "rebase")
+	if req.Onto != "" {
+		args = append(args, "--onto", req.Onto)
+	}
+	if req.From != "" {
+		args = append(args, req.From)
+	}
+	args = append(args, req.Branch)
+
+	if err := g.cmd(args...).Run(); err != nil {
+		return internal.MultiError(
+			fmt.Errorf("failed to rebase %q: %v", req.Branch, err),
+			// If this failed, abort the rebase so that we're not left in a
+			// bad state.
+			g.cmd("rebase", "--abort").Run(),
+		)
 	}
 	return nil
 }
