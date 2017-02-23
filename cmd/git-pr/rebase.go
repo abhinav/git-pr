@@ -6,11 +6,12 @@ import (
 
 	"github.com/abhinav/git-fu/cli"
 	"github.com/abhinav/git-fu/pr"
+
 	"github.com/jessevdk/go-flags"
 )
 
 type rebaseCmd struct {
-	Base string `long:"onto" required:"yes" value-name:"BASE" description:"Name of the base branch"`
+	Base string `long:"onto" value-name:"BASE" description:"Name of the base branch. If unspecified, only the dependents of the current branch will be rebased onto it."`
 	Args struct {
 		Branch string `positional-arg-name:"BRANCH" description:"Name of the branch to rebase. Defaults to the branch in the current directory."`
 	} `positional-args:"yes"`
@@ -45,19 +46,32 @@ func (r *rebaseCmd) Execute(args []string) error {
 		return err
 	}
 
-	switch len(prs) {
-	case 0:
+	if len(prs) == 0 {
 		return fmt.Errorf("Could not find PRs with head %q", branch)
-	case 1:
-		log.Println("Rebasing", *prs[0].HTMLURL)
-	default:
-		log.Println("Rebasing:")
-		for _, pr := range prs {
-			log.Printf(" - %v", *pr.HTMLURL)
-		}
 	}
 
-	res, err := svc.Rebase(&pr.RebaseRequest{PullRequests: prs, Base: r.Base})
+	var req pr.RebaseRequest
+	if r.Base == "" {
+		if len(prs) > 1 {
+			return errTooManyPRsWithHead{Head: branch, Pulls: prs}
+		}
+
+		head := *prs[0].Head.Ref
+		dependents, err := cfg.GitHub().ListPullRequestsByBase(head)
+		if err != nil {
+			return err
+		}
+		req = pr.RebaseRequest{PullRequests: dependents, Base: head}
+	} else {
+		req = pr.RebaseRequest{PullRequests: prs, Base: r.Base}
+	}
+
+	log.Println("Rebasing:")
+	for _, pr := range req.PullRequests {
+		log.Printf(" - %v", *pr.HTMLURL)
+	}
+
+	res, err := svc.Rebase(&req)
 	if err != nil {
 		return err
 	}

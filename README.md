@@ -107,6 +107,12 @@ Will result in,
                  \
                   o--o feature3
 
+The `--onto` argument may be skipped to leave the current branch unchanged but
+rebase all its dependent PRs onto its updated head. So the above could also be
+achieved with,
+
+    $ git checkout master
+    $ git pr rebase
 
 Code organization
 =================

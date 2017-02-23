@@ -89,6 +89,7 @@ func (e errTooManyPRsWithHead) Error() string {
 	for _, pull := range e.Pulls {
 		msg += fmt.Sprintf("\n -  %v", *pull.HTMLURL)
 	}
-	msg += fmt.Sprintf("\nPlease provide the PR number instead.")
+	// TODO: when we support this:
+	// msg += fmt.Sprintf("\nPlease provide the PR number instead.")
 	return msg
 }

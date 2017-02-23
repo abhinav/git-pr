@@ -1,6 +1,14 @@
 Releases
 ========
 
+v0.4.0 (unreleased)
+-------------------
+
+-   The `--onto` parameter for `git pr rebase` is now optional. If not
+    specified, the current branch is not rebased but all its dependents are
+    rebased on its updated head.
+
+
 v0.3.0 (2017-02-22)
 -------------------
 
