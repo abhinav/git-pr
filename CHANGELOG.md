@@ -1,7 +1,7 @@
 Releases
 ========
 
-v0.4.0 (unreleased)
+v0.4.0 (2017-02-22)
 -------------------
 
 -   The `--onto` parameter for `git pr rebase` is now optional. If not
