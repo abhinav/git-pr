@@ -4,6 +4,26 @@ Documentation and tests are lacking at this time.
 Installation
 ============
 
+Binaries
+--------
+
+Pre-built 64-bit binaries are available for Linux and Mac at
+<https://github.com/abhinav/git-fu/releases>. To install, simply unpack the
+archive and put the binaries somewhere on your `$PATH`.
+
+For example, if you have `$HOME/bin` on your `$PATH`,
+
+    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+    VERSION=v0.4.1
+    URL="https://github.com/abhinav/git-fu/releases/download/$VERSION/git-fu.$VERSION.$OS.amd64.tar.gz"
+    curl -L "$URL" | tar xv -C ~/bin
+
+Build From Source
+-----------------
+
+If you have Go installed and set up, use the following command to build
+`git-fu` from source.
+
     go get github.com/abhinav/git-fu/cmd/...
 
 Commands
