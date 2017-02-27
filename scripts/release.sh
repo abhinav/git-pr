@@ -23,7 +23,7 @@ build() {
 
 	mkdir -p "$releasedir"
 	for cmd in "${CMDS[@]}"; do
-		go build -o "$releasedir/$cmd" "./cmd/$cmd"
+		GOOS="$os" GOARCH="$arch" go build -o "$releasedir/$cmd" "./cmd/$cmd"
 	done
 
 	tar -cf "releases/$tarname" -C "$releasedir" .

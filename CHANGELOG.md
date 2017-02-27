@@ -1,6 +1,12 @@
 Releases
 ========
 
+v0.4.1 (unreleased)
+-------------------
+
+-   Fix auto-released Darwin binaries.
+
+
 v0.4.0 (2017-02-22)
 -------------------
 
