@@ -7,10 +7,11 @@ import (
 	"github.com/abhinav/git-fu/gateway"
 )
 
-const (
-	sshRemotePrefix  = "git@github.com:"
-	httpRemotePrefix = "https://github.com/"
-)
+var _prefixes = []string{
+	"ssh://git@github.com/",
+	"git@github.com:",
+	"https://github.com/",
+}
 
 // Guess determines the Repo name based on the current Git repository's remotes.
 func Guess(git gateway.Git) (*Repo, error) {
@@ -19,14 +20,12 @@ func Guess(git gateway.Git) (*Repo, error) {
 		return nil, err
 	}
 
-	switch {
-	case strings.HasPrefix(url, sshRemotePrefix):
-		url = url[len(sshRemotePrefix):]
-	case strings.HasPrefix(url, httpRemotePrefix):
-		url = url[len(httpRemotePrefix):]
-	default:
-		return nil, fmt.Errorf(`remote "origin" (%v) is not a GitHub remote`, url)
+	for _, prefix := range _prefixes {
+		if strings.HasPrefix(url, prefix) {
+			url := strings.TrimPrefix(url, prefix)
+			return Parse(strings.TrimSuffix(url, ".git"))
+		}
 	}
 
-	return Parse(strings.TrimSuffix(url, ".git"))
+	return nil, fmt.Errorf(`remote "origin" (%v) is not a GitHub remote`, url)
 }

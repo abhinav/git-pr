@@ -17,6 +17,7 @@ install:
 
 script:
 - go build ./cmd/...
+- go test $(glide nv)
 
 deploy:
 - provider: script

@@ -1,9 +1,16 @@
 package: github.com/abhinav/git-fu
 import:
 - package: github.com/google/go-github
+  version: master
   subpackages:
   - github
-  version: master
 - package: golang.org/x/oauth2
 - package: github.com/jessevdk/go-flags
 - package: github.com/zalando/go-keyring
+testImport:
+- package: github.com/golang/mock
+  subpackages:
+  - gomock
+- package: github.com/stretchr/testify
+  subpackages:
+  - assert

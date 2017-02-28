@@ -1,10 +1,14 @@
-hash: 4f48d3c67ae4cd3ea0bbd6aa217638abc2a6f9c132d22debb94ed1857d3b308b
-updated: 2017-02-19T16:25:02.258658367-08:00
+hash: 2b728fd694bb7b89450df5d1f112be98a60a02a3e9e79b05a3133b83c3d73f04
+updated: 2017-02-27T15:47:00.576832-08:00
 imports:
 - name: github.com/danieljoos/wincred
   version: cbe0c0023057b04ad78c6de5e8cb85ea9b5315be
 - name: github.com/godbus/dbus
-  version: 4b24ebee04561bf8a3bcc09aead82062edc56778
+  version: 692d22898a1dffbb54a37706afcb1324c510f2ac
+- name: github.com/golang/mock
+  version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
+  subpackages:
+  - gomock
 - name: github.com/golang/protobuf
   version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
@@ -18,13 +22,13 @@ imports:
   subpackages:
   - query
 - name: github.com/jessevdk/go-flags
-  version: 0648c820cd4e564706597268ae2d2c7d9e6900c6
+  version: 4e64e4a4e2552194cf594243e23aa9baf3b4297e
 - name: github.com/zalando/go-keyring
   version: e59fa393797e20dbc53303e827941e5bf8eadda1
   subpackages:
   - secret_service
 - name: golang.org/x/net
-  version: b400c2eff1badec7022a8c8f5bea058b6315eed7
+  version: 61557ac0112b576429a0df080e1c2cef5dfbb642
   subpackages:
   - context
 - name: golang.org/x/oauth2
@@ -41,4 +45,8 @@ imports:
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
-testImports: []
+testImports:
+- name: github.com/stretchr/testify
+  version: 4d4bfba8f1d1027c4fdbe371823030df51419987
+  subpackages:
+  - assert

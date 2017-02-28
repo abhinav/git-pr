@@ -1,6 +1,12 @@
 Releases
 ========
 
+v0.4.2 (unreleased)
+-------------------
+
+-   Recognize remotes in the form `ssh://git@github.com/*`.
+
+
 v0.4.1 (2017-02-27)
 -------------------
 
