@@ -14,7 +14,7 @@ archive and put the binaries somewhere on your `$PATH`.
 For example, if you have `$HOME/bin` on your `$PATH`,
 
     OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-    VERSION=v0.4.1
+    VERSION=v0.4.2
     URL="https://github.com/abhinav/git-fu/releases/download/$VERSION/git-fu.$VERSION.$OS.amd64.tar.gz"
     curl -L "$URL" | tar xv -C ~/bin
 
