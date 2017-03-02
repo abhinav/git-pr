@@ -6,28 +6,13 @@ import (
 
 	"github.com/abhinav/git-fu/gateway"
 	"github.com/abhinav/git-fu/internal"
+	"github.com/abhinav/git-fu/service"
+
 	"github.com/google/go-github/github"
 )
 
-// RebaseRequest is a request to rebase the given list of pull requests and
-// their dependencies onto the given base branch.
-//
-// If the base branch for the given PRs on GitHub is not the same as Base,
-// this will be updated too.
-type RebaseRequest struct {
-	PullRequests []*github.PullRequest
-	Base         string
-}
-
-// RebaseResponse is the response of the Rebase operation.
-type RebaseResponse struct {
-	// Local branches that were not updated because their heads did not match
-	// the remotes.
-	BranchesNotUpdated []string
-}
-
 // Rebase a pull request and its dependencies.
-func (s *Service) Rebase(req *RebaseRequest) (_ *RebaseResponse, err error) {
+func (s *Service) Rebase(req *service.RebaseRequest) (_ *service.RebaseResponse, err error) {
 	if err := s.Git.Fetch(&gateway.FetchRequest{Remote: "origin"}); err != nil {
 		return nil, err
 	}
@@ -104,7 +89,7 @@ func (s *Service) Rebase(req *RebaseRequest) (_ *RebaseResponse, err error) {
 	}
 	wg.Wait()
 
-	return &RebaseResponse{
+	return &service.RebaseResponse{
 		BranchesNotUpdated: BranchesNotUpdated,
 	}, internal.MultiError(errors...)
 }

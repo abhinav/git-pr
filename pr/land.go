@@ -3,31 +3,11 @@ package pr
 import (
 	"fmt"
 
-	"github.com/abhinav/git-fu/editor"
-
-	"github.com/google/go-github/github"
+	"github.com/abhinav/git-fu/service"
 )
 
-// LandRequest is a request to land the given pull request.
-type LandRequest struct {
-	// PullRqeuest to land
-	PullRequest *github.PullRequest
-
-	// Name of the local branch that points to this PR or an empty string if a
-	// local branch for this PR is not known.
-	LocalBranch string
-
-	// Editor to use for editing the commit message.
-	Editor editor.Editor
-}
-
-// LandResponse is the response of a land request.
-type LandResponse struct {
-	BranchesNotUpdated []string
-}
-
 // Land the given pull request.
-func (s *Service) Land(req *LandRequest) (*LandResponse, error) {
+func (s *Service) Land(req *service.LandRequest) (*service.LandResponse, error) {
 	pr := req.PullRequest
 	if err := UpdateMessage(req.Editor, pr); err != nil {
 		return nil, err
@@ -87,9 +67,9 @@ func (s *Service) Land(req *LandRequest) (*LandResponse, error) {
 		return nil, err
 	}
 
-	var res LandResponse
+	var res service.LandResponse
 	if len(dependents) > 0 {
-		rebaseRes, err := s.Rebase(&RebaseRequest{PullRequests: dependents, Base: base})
+		rebaseRes, err := s.Rebase(&service.RebaseRequest{PullRequests: dependents, Base: base})
 		if err != nil {
 			return nil, fmt.Errorf("failed to rebase dependents of %v: %v", *pr.HTMLURL, err)
 		}

@@ -6,7 +6,7 @@ import (
 
 	"github.com/abhinav/git-fu/cli"
 	"github.com/abhinav/git-fu/editor"
-	"github.com/abhinav/git-fu/pr"
+	"github.com/abhinav/git-fu/service"
 
 	"github.com/google/go-github/github"
 	"github.com/jessevdk/go-flags"
@@ -18,26 +18,29 @@ type landCmd struct {
 		Branch string `positional-arg-name:"BRANCH" description:"Name of the branch to land. Defaults to the branch in the current directory."`
 	} `positional-args:"yes"`
 
-	getConfig cli.ConfigBuilder
+	getConfig configBuilder
+	getEditor func(string) (editor.Editor, error)
 }
 
 func newLandCommand(cbuild cli.ConfigBuilder) flags.Commander {
-	return &landCmd{getConfig: cbuild}
+	return &landCmd{
+		getConfig: newConfigBuilder(cbuild),
+		getEditor: editor.Pick,
+	}
 }
 
-func (l *landCmd) Execute(args []string) error {
+func (l *landCmd) Execute([]string) error {
 	cfg, err := l.getConfig()
 	if err != nil {
 		return err
 	}
 
-	editor, err := editor.Pick(l.Editor)
+	editor, err := l.getEditor(l.Editor)
 	if err != nil {
 		return err
 	}
 
-	req := pr.LandRequest{Editor: editor}
-	svc := pr.Service{GitHub: cfg.GitHub(), Git: cfg.Git()}
+	req := service.LandRequest{Editor: editor}
 
 	// TODO: accept other inputs for the PR to land
 	branch := l.Args.Branch
@@ -64,7 +67,7 @@ func (l *landCmd) Execute(args []string) error {
 	}
 
 	log.Println("Landing", *req.PullRequest.HTMLURL)
-	res, err := svc.Land(&req)
+	res, err := cfg.Service.Land(&req)
 	if err != nil {
 		return fmt.Errorf("failed to land %v: %v", *req.PullRequest.HTMLURL, err)
 	}

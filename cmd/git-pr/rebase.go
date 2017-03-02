@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/abhinav/git-fu/cli"
-	"github.com/abhinav/git-fu/pr"
+	"github.com/abhinav/git-fu/service"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -16,20 +16,18 @@ type rebaseCmd struct {
 		Branch string `positional-arg-name:"BRANCH" description:"Name of the branch to rebase. Defaults to the branch in the current directory."`
 	} `positional-args:"yes"`
 
-	getConfig cli.ConfigBuilder
+	getConfig configBuilder
 }
 
 func newRebaseCommand(cbuild cli.ConfigBuilder) flags.Commander {
-	return &rebaseCmd{getConfig: cbuild}
+	return &rebaseCmd{getConfig: newConfigBuilder(cbuild)}
 }
 
-func (r *rebaseCmd) Execute(args []string) error {
+func (r *rebaseCmd) Execute([]string) error {
 	cfg, err := r.getConfig()
 	if err != nil {
 		return err
 	}
-
-	svc := pr.Service{GitHub: cfg.GitHub(), Git: cfg.Git()}
 
 	// TODO: accept other inputs for the PR to land
 	branch := r.Args.Branch
@@ -50,7 +48,7 @@ func (r *rebaseCmd) Execute(args []string) error {
 		return fmt.Errorf("Could not find PRs with head %q", branch)
 	}
 
-	var req pr.RebaseRequest
+	var req service.RebaseRequest
 	if r.Base == "" {
 		if len(prs) > 1 {
 			return errTooManyPRsWithHead{Head: branch, Pulls: prs}
@@ -61,9 +59,9 @@ func (r *rebaseCmd) Execute(args []string) error {
 		if err != nil {
 			return err
 		}
-		req = pr.RebaseRequest{PullRequests: dependents, Base: head}
+		req = service.RebaseRequest{PullRequests: dependents, Base: head}
 	} else {
-		req = pr.RebaseRequest{PullRequests: prs, Base: r.Base}
+		req = service.RebaseRequest{PullRequests: prs, Base: r.Base}
 	}
 
 	log.Println("Rebasing:")
@@ -71,7 +69,7 @@ func (r *rebaseCmd) Execute(args []string) error {
 		log.Printf(" - %v", *pr.HTMLURL)
 	}
 
-	res, err := svc.Rebase(&req)
+	res, err := cfg.Service.Rebase(&req)
 	if err != nil {
 		return err
 	}
