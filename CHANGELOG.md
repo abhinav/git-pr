@@ -1,6 +1,13 @@
 Releases
 ========
 
+v0.4.3 (unreleased)
+-------------------
+
+-   Fixed a bug where `git pr rebase` would call `git push -f` without any
+    arguments if there is nothing to rebase.
+
+
 v0.4.2 (2017-02-27)
 -------------------
 

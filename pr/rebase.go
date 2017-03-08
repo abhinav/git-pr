@@ -32,6 +32,10 @@ func (s *Service) Rebase(req *service.RebaseRequest) (_ *service.RebaseResponse,
 		}
 	}()
 
+	if len(result) == 0 {
+		return &service.RebaseResponse{}, nil
+	}
+
 	var (
 		// These branches will be reset locally after pushing.
 		branchesToReset []string
@@ -101,7 +105,11 @@ type rebasedPullRequest struct {
 
 // Do all rebasing locally without pushing anything. It is the caller's
 // responsibility to delete the temporary local branches in result list.
-func dryRebase(s *Service, baseRef string, prs []*github.PullRequest) (_ []rebasedPullRequest, err error) {
+func dryRebase(
+	s *Service,
+	baseRef string,
+	prs []*github.PullRequest,
+) (_ []rebasedPullRequest, err error) {
 	baseBranch := uniqueBranchName(s.Git, "base-"+baseRef)
 	if err := s.Git.CreateBranch(baseBranch, baseRef); err != nil {
 		return nil, fmt.Errorf("failed to create temporary branch: %v", err)

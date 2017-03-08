@@ -148,6 +148,10 @@ func (g *Gateway) Push(req *gateway.PushRequest) error {
 
 // PushMany pushes multiple refs to a remote
 func (g *Gateway) PushMany(req *gateway.PushManyRequest) error {
+	if len(req.Refs) == 0 {
+		return nil
+	}
+
 	args := append(make([]string, 0, len(req.Refs)+2), "push")
 	if req.Force {
 		args = append(args, "-f")
