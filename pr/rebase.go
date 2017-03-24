@@ -5,10 +5,10 @@ import (
 	"sync"
 
 	"github.com/abhinav/git-fu/gateway"
-	"github.com/abhinav/git-fu/internal"
 	"github.com/abhinav/git-fu/service"
 
 	"github.com/google/go-github/github"
+	"go.uber.org/multierr"
 )
 
 // Rebase a pull request and its dependencies.
@@ -28,7 +28,7 @@ func (s *Service) Rebase(req *service.RebaseRequest) (_ *service.RebaseResponse,
 	}
 	defer func() {
 		for _, r := range result {
-			err = internal.MultiError(err, s.Git.DeleteBranch(r.LocalBranch))
+			err = multierr.Append(err, s.Git.DeleteBranch(r.LocalBranch))
 		}
 	}()
 
@@ -63,10 +63,10 @@ func (s *Service) Rebase(req *service.RebaseRequest) (_ *service.RebaseResponse,
 		return nil, err
 	}
 
-	var errors []error
+	var errors error
 	for _, br := range branchesToReset {
 		if err := s.Git.ResetBranch(br, "origin/"+br); err != nil {
-			errors = append(errors, fmt.Errorf("failed to update branch %q: %v", br, err))
+			errors = multierr.Append(errors, fmt.Errorf("failed to update branch %q: %v", br, err))
 		}
 	}
 
@@ -85,7 +85,7 @@ func (s *Service) Rebase(req *service.RebaseRequest) (_ *service.RebaseResponse,
 				}
 
 				mu.Lock()
-				errors = append(errors, fmt.Errorf(
+				errors = multierr.Append(errors, fmt.Errorf(
 					"failed to set base for %v to %q", *pr.HTMLURL, req.Base))
 				mu.Unlock()
 			}(pr)
@@ -95,7 +95,7 @@ func (s *Service) Rebase(req *service.RebaseRequest) (_ *service.RebaseResponse,
 
 	return &service.RebaseResponse{
 		BranchesNotUpdated: BranchesNotUpdated,
-	}, internal.MultiError(errors...)
+	}, errors
 }
 
 type rebasedPullRequest struct {
@@ -115,7 +115,7 @@ func dryRebase(
 		return nil, fmt.Errorf("failed to create temporary branch: %v", err)
 	}
 	// Can't rely on branchesCreated because this should always be cleaned up
-	defer func() { err = internal.MultiError(err, s.Git.DeleteBranch(baseBranch)) }()
+	defer func() { err = multierr.Append(err, s.Git.DeleteBranch(baseBranch)) }()
 
 	// Rebase changes the current branch so we should restore it after we are
 	// done.
@@ -123,13 +123,13 @@ func dryRebase(
 	if err != nil {
 		return nil, err
 	}
-	defer func() { err = internal.MultiError(err, s.Git.Checkout(oldBranch)) }()
+	defer func() { err = multierr.Append(err, s.Git.Checkout(oldBranch)) }()
 
 	var (
 		// List of temporary branches created locally. If we fail with an error,
 		// we will be sure to delete all of these.
 		branchesCreated []string
-		errors          []error
+		errors          error
 		result          []rebasedPullRequest
 	)
 	defer func() {
@@ -140,7 +140,7 @@ func dryRebase(
 		// The operation failed for some reason. Clean up whatever we have
 		// created so far.
 		for _, br := range branchesCreated {
-			err = internal.MultiError(err, s.Git.DeleteBranch(br))
+			err = multierr.Append(err, s.Git.DeleteBranch(br))
 		}
 	}()
 
@@ -153,7 +153,7 @@ func dryRebase(
 
 		prBranch := uniqueBranchName(s.Git, fmt.Sprintf("rebase-%v", *pr.Number))
 		if err := s.Git.CreateBranch(prBranch, *pr.Head.SHA); err != nil {
-			errors = append(errors, fmt.Errorf(
+			errors = multierr.Append(errors, fmt.Errorf(
 				"could not find head %v for PR %v: %v", *pr.Head.SHA, *pr.HTMLURL, err))
 			continue
 		}
@@ -164,7 +164,7 @@ func dryRebase(
 			From:   *pr.Base.SHA,
 			Branch: prBranch,
 		}); err != nil {
-			errors = append(errors, fmt.Errorf(
+			errors = multierr.Append(errors, fmt.Errorf(
 				"failed to rebase PR %v: %v", *pr.HTMLURL, err))
 			continue
 		}
@@ -172,21 +172,21 @@ func dryRebase(
 
 		dependents, err := s.GitHub.ListPullRequestsByBase(*pr.Head.Ref)
 		if err != nil {
-			errors = append(errors, fmt.Errorf(
+			errors = multierr.Append(errors, fmt.Errorf(
 				"could not get dependents of %v: %v", *pr.HTMLURL, err))
 			continue
 		}
 
 		depResult, err := dryRebase(s, prBranch, dependents)
 		if err != nil {
-			errors = append(errors, fmt.Errorf(
+			errors = multierr.Append(errors, fmt.Errorf(
 				"could not rebase dependents of %v: %v", *pr.HTMLURL, err))
 			continue
 		}
 		result = append(result, depResult...)
 	}
 
-	return result, internal.MultiError(errors...)
+	return result, errors
 }
 
 func uniqueBranchName(git gateway.Git, template string) string {

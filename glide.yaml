@@ -7,6 +7,7 @@ import:
 - package: golang.org/x/oauth2
 - package: github.com/jessevdk/go-flags
 - package: github.com/zalando/go-keyring
+- package: go.uber.org/multierr
 testImport:
 - package: github.com/golang/mock
   subpackages:

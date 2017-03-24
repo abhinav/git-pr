@@ -31,6 +31,6 @@ func Main(opts ...Option) {
 	}
 
 	if _, err := parser.Parse(); err != nil {
-		log.Fatal(err)
+		log.Fatalf("%+v", err)
 	}
 }

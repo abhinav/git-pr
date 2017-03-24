@@ -1,16 +1,16 @@
-hash: 2b728fd694bb7b89450df5d1f112be98a60a02a3e9e79b05a3133b83c3d73f04
-updated: 2017-02-27T15:47:00.576832-08:00
+hash: 34625e1c8cc7b32c96d24940589c732046b06fda18e0194ebfd0f3877b769408
+updated: 2017-03-24T11:39:29.529271281-07:00
 imports:
 - name: github.com/danieljoos/wincred
   version: cbe0c0023057b04ad78c6de5e8cb85ea9b5315be
 - name: github.com/godbus/dbus
-  version: 692d22898a1dffbb54a37706afcb1324c510f2ac
+  version: b038411ec341afd52c6d36d8baae92a29e6e8a9e
 - name: github.com/golang/mock
   version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
-  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  version: c9c7427a2a70d2eb3bafa0ab2dc163e45f143317
   subpackages:
   - proto
 - name: github.com/google/go-github
@@ -18,35 +18,48 @@ imports:
   subpackages:
   - github
 - name: github.com/google/go-querystring
-  version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
+  version: 53e6ce116135b80d037921a7fdd5138cf32d7a8a
   subpackages:
   - query
 - name: github.com/jessevdk/go-flags
-  version: 4e64e4a4e2552194cf594243e23aa9baf3b4297e
+  version: 460c7bb0abd6e927f2767cadc91aa6ef776a98b4
 - name: github.com/zalando/go-keyring
-  version: e59fa393797e20dbc53303e827941e5bf8eadda1
+  version: dcbcb8215e7449155ca2bd5b4fc67e0b91e175f1
   subpackages:
   - secret_service
+- name: go.uber.org/multierr
+  version: a0f768a1e18683858c0bfc4e1f13ee1e0b77b482
 - name: golang.org/x/net
-  version: 61557ac0112b576429a0df080e1c2cef5dfbb642
+  version: 3e967e1d28d2c9c06e749dc2bdc14b04df89e689
   subpackages:
   - context
 - name: golang.org/x/oauth2
-  version: 314dd2c0bf3ebd592ec0d20847d27e79d0dbe8dd
+  version: 7fdf09982454086d5570c7db3e11f360194830ca
   subpackages:
   - internal
 - name: google.golang.org/appengine
-  version: a2c54d2174c17540446e0ced57d9d459af61bc1c
+  version: 56d253d1dd14aa01937e12c73a0971bcfd797ff2
   subpackages:
   - internal
+  - internal/app_identity
   - internal/base
   - internal/datastore
   - internal/log
+  - internal/modules
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
 testImports:
+- name: github.com/davecgh/go-spew
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  subpackages:
+  - difflib
 - name: github.com/stretchr/testify
   version: 4d4bfba8f1d1027c4fdbe371823030df51419987
   subpackages:
   - assert
+  - require

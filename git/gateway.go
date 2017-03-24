@@ -9,7 +9,8 @@ import (
 	"strings"
 
 	"github.com/abhinav/git-fu/gateway"
-	"github.com/abhinav/git-fu/internal"
+
+	"go.uber.org/multierr"
 )
 
 // Gateway is a git gateway.
@@ -203,7 +204,7 @@ func (g *Gateway) Rebase(req *gateway.RebaseRequest) error {
 	args = append(args, req.Branch)
 
 	if err := g.cmd(args...).Run(); err != nil {
-		return internal.MultiError(
+		return multierr.Append(
 			fmt.Errorf("failed to rebase %q: %v", req.Branch, err),
 			// If this failed, abort the rebase so that we're not left in a
 			// bad state.
