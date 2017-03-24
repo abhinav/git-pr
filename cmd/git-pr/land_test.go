@@ -115,14 +115,14 @@ func TestLandCmd(t *testing.T) {
 			git.EXPECT().CurrentBranch().Return(tt.CurrentBranch, nil).AnyTimes()
 
 			for head, prs := range tt.PullRequestsByHead {
-				github.EXPECT().ListPullRequestsByHead("", head).Return(prs, nil)
+				github.EXPECT().ListPullRequestsByHead(gomock.Any(), "", head).Return(prs, nil)
 			}
 
 			if tt.ExpectLandRequest != nil {
 				if tt.ExpectLandRequest.Editor == nil {
 					tt.ExpectLandRequest.Editor = ed
 				}
-				svc.EXPECT().Land(tt.ExpectLandRequest).Return(tt.ReturnLandResponse, nil)
+				svc.EXPECT().Land(gomock.Any(), tt.ExpectLandRequest).Return(tt.ReturnLandResponse, nil)
 			}
 
 			err := cmd.Execute(nil)

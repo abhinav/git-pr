@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -24,6 +25,8 @@ func newRebaseCommand(cbuild cli.ConfigBuilder) flags.Commander {
 }
 
 func (r *rebaseCmd) Execute([]string) error {
+	ctx := context.Background()
+
 	cfg, err := r.getConfig()
 	if err != nil {
 		return err
@@ -39,7 +42,7 @@ func (r *rebaseCmd) Execute([]string) error {
 		branch = out
 	}
 
-	prs, err := cfg.GitHub().ListPullRequestsByHead("", branch)
+	prs, err := cfg.GitHub().ListPullRequestsByHead(ctx, "", branch)
 	if err != nil {
 		return err
 	}
@@ -55,7 +58,7 @@ func (r *rebaseCmd) Execute([]string) error {
 		}
 
 		head := *prs[0].Head.Ref
-		dependents, err := cfg.GitHub().ListPullRequestsByBase(head)
+		dependents, err := cfg.GitHub().ListPullRequestsByBase(ctx, head)
 		if err != nil {
 			return err
 		}
@@ -69,7 +72,7 @@ func (r *rebaseCmd) Execute([]string) error {
 		log.Printf(" - %v", *pr.HTMLURL)
 	}
 
-	res, err := cfg.Service.Rebase(&req)
+	res, err := cfg.Service.Rebase(ctx, &req)
 	if err != nil {
 		return err
 	}

@@ -1,13 +1,14 @@
 package pr
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/abhinav/git-fu/service"
 )
 
 // Land the given pull request.
-func (s *Service) Land(req *service.LandRequest) (*service.LandResponse, error) {
+func (s *Service) Land(ctx context.Context, req *service.LandRequest) (*service.LandResponse, error) {
 	pr := req.PullRequest
 	if err := UpdateMessage(req.Editor, pr); err != nil {
 		return nil, err
@@ -38,7 +39,7 @@ func (s *Service) Land(req *service.LandRequest) (*service.LandResponse, error) 
 		}
 	}
 
-	if err := s.GitHub.SquashPullRequest(pr); err != nil {
+	if err := s.GitHub.SquashPullRequest(ctx, pr); err != nil {
 		return nil, err
 	}
 
@@ -58,18 +59,18 @@ func (s *Service) Land(req *service.LandRequest) (*service.LandResponse, error) 
 	}
 
 	// Nothing else to do if we don't own this pull request.
-	if !s.GitHub.IsOwned(pr.Head) {
+	if !s.GitHub.IsOwned(ctx, pr.Head) {
 		return nil, nil
 	}
 
-	dependents, err := s.GitHub.ListPullRequestsByBase(*pr.Head.Ref)
+	dependents, err := s.GitHub.ListPullRequestsByBase(ctx, *pr.Head.Ref)
 	if err != nil {
 		return nil, err
 	}
 
 	var res service.LandResponse
 	if len(dependents) > 0 {
-		rebaseRes, err := s.Rebase(&service.RebaseRequest{PullRequests: dependents, Base: base})
+		rebaseRes, err := s.Rebase(ctx, &service.RebaseRequest{PullRequests: dependents, Base: base})
 		if err != nil {
 			return nil, fmt.Errorf("failed to rebase dependents of %v: %v", *pr.HTMLURL, err)
 		}
@@ -78,7 +79,7 @@ func (s *Service) Land(req *service.LandRequest) (*service.LandResponse, error) 
 
 	// TODO: What happens on branch deletion if we had dependents but none
 	// were owned by us?
-	if err := s.GitHub.DeleteBranch(*pr.Head.Ref); err != nil {
+	if err := s.GitHub.DeleteBranch(ctx, *pr.Head.Ref); err != nil {
 		return nil, err
 	}
 

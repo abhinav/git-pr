@@ -4,6 +4,7 @@
 package gatewaytest
 
 import (
+	context "context"
 	gateway "github.com/abhinav/git-fu/gateway"
 	github "github.com/google/go-github/github"
 	gomock "github.com/golang/mock/gomock"
@@ -214,75 +215,75 @@ func (_m *MockGitHub) EXPECT() *_MockGitHubRecorder {
 	return _m.recorder
 }
 
-func (_m *MockGitHub) DeleteBranch(_param0 string) error {
-	ret := _m.ctrl.Call(_m, "DeleteBranch", _param0)
+func (_m *MockGitHub) DeleteBranch(_param0 context.Context, _param1 string) error {
+	ret := _m.ctrl.Call(_m, "DeleteBranch", _param0, _param1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-func (_mr *_MockGitHubRecorder) DeleteBranch(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeleteBranch", arg0)
+func (_mr *_MockGitHubRecorder) DeleteBranch(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeleteBranch", arg0, arg1)
 }
 
-func (_m *MockGitHub) GetPullRequestPatch(_param0 int) (string, error) {
-	ret := _m.ctrl.Call(_m, "GetPullRequestPatch", _param0)
+func (_m *MockGitHub) GetPullRequestPatch(_param0 context.Context, _param1 int) (string, error) {
+	ret := _m.ctrl.Call(_m, "GetPullRequestPatch", _param0, _param1)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockGitHubRecorder) GetPullRequestPatch(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetPullRequestPatch", arg0)
+func (_mr *_MockGitHubRecorder) GetPullRequestPatch(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetPullRequestPatch", arg0, arg1)
 }
 
-func (_m *MockGitHub) IsOwned(_param0 *github.PullRequestBranch) bool {
-	ret := _m.ctrl.Call(_m, "IsOwned", _param0)
+func (_m *MockGitHub) IsOwned(_param0 context.Context, _param1 *github.PullRequestBranch) bool {
+	ret := _m.ctrl.Call(_m, "IsOwned", _param0, _param1)
 	ret0, _ := ret[0].(bool)
 	return ret0
 }
 
-func (_mr *_MockGitHubRecorder) IsOwned(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "IsOwned", arg0)
+func (_mr *_MockGitHubRecorder) IsOwned(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "IsOwned", arg0, arg1)
 }
 
-func (_m *MockGitHub) ListPullRequestsByBase(_param0 string) ([]*github.PullRequest, error) {
-	ret := _m.ctrl.Call(_m, "ListPullRequestsByBase", _param0)
+func (_m *MockGitHub) ListPullRequestsByBase(_param0 context.Context, _param1 string) ([]*github.PullRequest, error) {
+	ret := _m.ctrl.Call(_m, "ListPullRequestsByBase", _param0, _param1)
 	ret0, _ := ret[0].([]*github.PullRequest)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockGitHubRecorder) ListPullRequestsByBase(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListPullRequestsByBase", arg0)
+func (_mr *_MockGitHubRecorder) ListPullRequestsByBase(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListPullRequestsByBase", arg0, arg1)
 }
 
-func (_m *MockGitHub) ListPullRequestsByHead(_param0 string, _param1 string) ([]*github.PullRequest, error) {
-	ret := _m.ctrl.Call(_m, "ListPullRequestsByHead", _param0, _param1)
+func (_m *MockGitHub) ListPullRequestsByHead(_param0 context.Context, _param1 string, _param2 string) ([]*github.PullRequest, error) {
+	ret := _m.ctrl.Call(_m, "ListPullRequestsByHead", _param0, _param1, _param2)
 	ret0, _ := ret[0].([]*github.PullRequest)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockGitHubRecorder) ListPullRequestsByHead(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListPullRequestsByHead", arg0, arg1)
+func (_mr *_MockGitHubRecorder) ListPullRequestsByHead(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListPullRequestsByHead", arg0, arg1, arg2)
 }
 
-func (_m *MockGitHub) SetPullRequestBase(_param0 int, _param1 string) error {
-	ret := _m.ctrl.Call(_m, "SetPullRequestBase", _param0, _param1)
+func (_m *MockGitHub) SetPullRequestBase(_param0 context.Context, _param1 int, _param2 string) error {
+	ret := _m.ctrl.Call(_m, "SetPullRequestBase", _param0, _param1, _param2)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-func (_mr *_MockGitHubRecorder) SetPullRequestBase(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "SetPullRequestBase", arg0, arg1)
+func (_mr *_MockGitHubRecorder) SetPullRequestBase(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "SetPullRequestBase", arg0, arg1, arg2)
 }
 
-func (_m *MockGitHub) SquashPullRequest(_param0 *github.PullRequest) error {
-	ret := _m.ctrl.Call(_m, "SquashPullRequest", _param0)
+func (_m *MockGitHub) SquashPullRequest(_param0 context.Context, _param1 *github.PullRequest) error {
+	ret := _m.ctrl.Call(_m, "SquashPullRequest", _param0, _param1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-func (_mr *_MockGitHubRecorder) SquashPullRequest(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "SquashPullRequest", arg0)
+func (_mr *_MockGitHubRecorder) SquashPullRequest(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "SquashPullRequest", arg0, arg1)
 }

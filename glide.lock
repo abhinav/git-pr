@@ -1,5 +1,5 @@
-hash: 34625e1c8cc7b32c96d24940589c732046b06fda18e0194ebfd0f3877b769408
-updated: 2017-03-24T11:39:29.529271281-07:00
+hash: 256da848ea3e206955a39a100c06162017a3ecd84ca835c57c74938be875bd5e
+updated: 2017-03-24T14:36:07.532232807-07:00
 imports:
 - name: github.com/danieljoos/wincred
   version: cbe0c0023057b04ad78c6de5e8cb85ea9b5315be
@@ -14,7 +14,7 @@ imports:
   subpackages:
   - proto
 - name: github.com/google/go-github
-  version: 2ec691a35b10b8c1471955a96d0f182a572e1cad
+  version: d683a1c6198d75c6be7a7ab5e2f9834cb6408834
   subpackages:
   - github
 - name: github.com/google/go-querystring
@@ -28,7 +28,7 @@ imports:
   subpackages:
   - secret_service
 - name: go.uber.org/multierr
-  version: a0f768a1e18683858c0bfc4e1f13ee1e0b77b482
+  version: de6740a55f8d778e53755317dc50aae950c760de
 - name: golang.org/x/net
   version: 3e967e1d28d2c9c06e749dc2bdc14b04df89e689
   subpackages:

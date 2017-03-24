@@ -4,6 +4,7 @@
 package servicetest
 
 import (
+	context "context"
 	service "github.com/abhinav/git-fu/service"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -29,24 +30,24 @@ func (_m *MockPR) EXPECT() *_MockPRRecorder {
 	return _m.recorder
 }
 
-func (_m *MockPR) Land(_param0 *service.LandRequest) (*service.LandResponse, error) {
-	ret := _m.ctrl.Call(_m, "Land", _param0)
+func (_m *MockPR) Land(_param0 context.Context, _param1 *service.LandRequest) (*service.LandResponse, error) {
+	ret := _m.ctrl.Call(_m, "Land", _param0, _param1)
 	ret0, _ := ret[0].(*service.LandResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockPRRecorder) Land(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "Land", arg0)
+func (_mr *_MockPRRecorder) Land(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Land", arg0, arg1)
 }
 
-func (_m *MockPR) Rebase(_param0 *service.RebaseRequest) (*service.RebaseResponse, error) {
-	ret := _m.ctrl.Call(_m, "Rebase", _param0)
+func (_m *MockPR) Rebase(_param0 context.Context, _param1 *service.RebaseRequest) (*service.RebaseResponse, error) {
+	ret := _m.ctrl.Call(_m, "Rebase", _param0, _param1)
 	ret0, _ := ret[0].(*service.RebaseResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockPRRecorder) Rebase(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "Rebase", arg0)
+func (_mr *_MockPRRecorder) Rebase(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Rebase", arg0, arg1)
 }

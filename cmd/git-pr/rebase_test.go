@@ -159,15 +159,15 @@ func TestRebaseCmd(t *testing.T) {
 			git.EXPECT().CurrentBranch().Return(tt.CurrentBranch, nil).AnyTimes()
 
 			for head, prs := range tt.PullRequestsByHead {
-				github.EXPECT().ListPullRequestsByHead("", head).Return(prs, nil)
+				github.EXPECT().ListPullRequestsByHead(gomock.Any(), "", head).Return(prs, nil)
 			}
 
 			for base, prs := range tt.PullRequestsByBase {
-				github.EXPECT().ListPullRequestsByBase(base).Return(prs, nil)
+				github.EXPECT().ListPullRequestsByBase(gomock.Any(), base).Return(prs, nil)
 			}
 
 			if tt.ExpectRebaseRequest != nil {
-				svc.EXPECT().Rebase(tt.ExpectRebaseRequest).Return(tt.ReturnRebaseResponse, nil)
+				svc.EXPECT().Rebase(gomock.Any(), tt.ExpectRebaseRequest).Return(tt.ReturnRebaseResponse, nil)
 			}
 
 			err := cmd.Execute(nil)

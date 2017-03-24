@@ -1,6 +1,7 @@
 package pr
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -12,7 +13,7 @@ import (
 )
 
 // Rebase a pull request and its dependencies.
-func (s *Service) Rebase(req *service.RebaseRequest) (_ *service.RebaseResponse, err error) {
+func (s *Service) Rebase(ctx context.Context, req *service.RebaseRequest) (_ *service.RebaseResponse, err error) {
 	if err := s.Git.Fetch(&gateway.FetchRequest{Remote: "origin"}); err != nil {
 		return nil, err
 	}
@@ -22,7 +23,7 @@ func (s *Service) Rebase(req *service.RebaseRequest) (_ *service.RebaseResponse,
 		return nil, err
 	}
 
-	result, err := dryRebase(s, baseRef, req.PullRequests)
+	result, err := dryRebase(ctx, s, baseRef, req.PullRequests)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +80,7 @@ func (s *Service) Rebase(req *service.RebaseRequest) (_ *service.RebaseResponse,
 			wg.Add(1)
 			go func(pr *github.PullRequest) {
 				defer wg.Done()
-				err := s.GitHub.SetPullRequestBase(*pr.Number, req.Base)
+				err := s.GitHub.SetPullRequestBase(ctx, *pr.Number, req.Base)
 				if err == nil {
 					return
 				}
@@ -106,6 +107,7 @@ type rebasedPullRequest struct {
 // Do all rebasing locally without pushing anything. It is the caller's
 // responsibility to delete the temporary local branches in result list.
 func dryRebase(
+	ctx context.Context,
 	s *Service,
 	baseRef string,
 	prs []*github.PullRequest,
@@ -146,7 +148,7 @@ func dryRebase(
 
 	for _, pr := range prs {
 		// We don't own this branch so we can't rebase it.
-		if !s.GitHub.IsOwned(pr.Head) {
+		if !s.GitHub.IsOwned(ctx, pr.Head) {
 			// TODO: log or record which PRs are skipped
 			continue
 		}
@@ -170,14 +172,14 @@ func dryRebase(
 		}
 		result = append(result, rebasedPullRequest{PullRequest: pr, LocalBranch: prBranch})
 
-		dependents, err := s.GitHub.ListPullRequestsByBase(*pr.Head.Ref)
+		dependents, err := s.GitHub.ListPullRequestsByBase(ctx, *pr.Head.Ref)
 		if err != nil {
 			errors = multierr.Append(errors, fmt.Errorf(
 				"could not get dependents of %v: %v", *pr.HTMLURL, err))
 			continue
 		}
 
-		depResult, err := dryRebase(s, prBranch, dependents)
+		depResult, err := dryRebase(ctx, s, prBranch, dependents)
 		if err != nil {
 			errors = multierr.Append(errors, fmt.Errorf(
 				"could not rebase dependents of %v: %v", *pr.HTMLURL, err))

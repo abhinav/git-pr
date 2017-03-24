@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/abhinav/git-fu/editor"
 
 	"github.com/google/go-github/github"
@@ -44,8 +46,8 @@ type RebaseResponse struct {
 // PR is the service that provides pull request related operations.
 type PR interface {
 	// Lands a pull request
-	Land(*LandRequest) (*LandResponse, error)
+	Land(context.Context, *LandRequest) (*LandResponse, error)
 
 	// Rebases a pull request.
-	Rebase(*RebaseRequest) (*RebaseResponse, error)
+	Rebase(context.Context, *RebaseRequest) (*RebaseResponse, error)
 }

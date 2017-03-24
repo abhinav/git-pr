@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/abhinav/git-fu/gateway"
@@ -11,7 +12,10 @@ import (
 
 // gitService is the GitHub Git service.
 type gitService interface {
-	DeleteRef(owner string, repo string, ref string) (*github.Response, error)
+	DeleteRef(
+		ctx context.Context,
+		owner string, repo string, ref string,
+	) (*github.Response, error)
 }
 
 var _ gitService = (*github.GitService)(nil)
@@ -19,19 +23,23 @@ var _ gitService = (*github.GitService)(nil)
 // pullRequestsService is the GitHub PullRequests client.
 type pullRequestsService interface {
 	Edit(
+		ctx context.Context,
 		owner string, repo string, number int,
 		pull *github.PullRequest,
 	) (*github.PullRequest, *github.Response, error)
 
 	GetRaw(
+		ctx context.Context,
 		owner string, repo string, number int, opt github.RawOptions,
 	) (string, *github.Response, error)
 
 	List(
+		ctx context.Context,
 		owner string, repo string, opt *github.PullRequestListOptions,
 	) ([]*github.PullRequest, *github.Response, error)
 
 	Merge(
+		ctx context.Context,
 		owner string, repo string, number int,
 		commitMessage string,
 		options *github.PullRequestOptions,
@@ -66,17 +74,18 @@ func (g *Gateway) urlFor(number int) string {
 }
 
 // IsOwned checks if this branch is local to this repository.
-func (g *Gateway) IsOwned(br *github.PullRequestBranch) bool {
+func (g *Gateway) IsOwned(ctx context.Context, br *github.PullRequestBranch) bool {
 	return *br.Repo.Owner.Login == g.owner && *br.Repo.Name == g.repo
 }
 
 // ListPullRequestsByHead lists pull requests with the given head.
-func (g *Gateway) ListPullRequestsByHead(owner, branch string) ([]*github.PullRequest, error) {
+func (g *Gateway) ListPullRequestsByHead(ctx context.Context, owner, branch string) ([]*github.PullRequest, error) {
 	if owner == "" {
 		owner = g.owner
 	}
 	// TODO: account for pagination
 	prs, _, err := g.pulls.List(
+		ctx,
 		g.owner,
 		g.repo,
 		&github.PullRequestListOptions{Head: owner + ":" + branch})
@@ -88,9 +97,10 @@ func (g *Gateway) ListPullRequestsByHead(owner, branch string) ([]*github.PullRe
 }
 
 // ListPullRequestsByBase lists pull requests made against the given merge base.
-func (g *Gateway) ListPullRequestsByBase(branch string) ([]*github.PullRequest, error) {
+func (g *Gateway) ListPullRequestsByBase(ctx context.Context, branch string) ([]*github.PullRequest, error) {
 	// TODO: account for pagination
 	prs, _, err := g.pulls.List(
+		ctx,
 		g.owner,
 		g.repo,
 		&github.PullRequestListOptions{Base: branch})
@@ -103,9 +113,9 @@ func (g *Gateway) ListPullRequestsByBase(branch string) ([]*github.PullRequest, 
 
 // GetPullRequestPatch retrieves the raw patch for the given PR. The contents
 // of the patch may be applied using the git-am command.
-func (g *Gateway) GetPullRequestPatch(number int) (string, error) {
+func (g *Gateway) GetPullRequestPatch(ctx context.Context, number int) (string, error) {
 	patch, _, err := g.pulls.GetRaw(
-		g.owner, g.repo, number, github.RawOptions{Type: github.Patch})
+		ctx, g.owner, g.repo, number, github.RawOptions{Type: github.Patch})
 	if err != nil {
 		err = fmt.Errorf("failed to retrieve patch for %v: %v", g.urlFor(number), err)
 	}
@@ -113,8 +123,8 @@ func (g *Gateway) GetPullRequestPatch(number int) (string, error) {
 }
 
 // SetPullRequestBase changes the merge base for the given PR.
-func (g *Gateway) SetPullRequestBase(number int, base string) error {
-	_, _, err := g.pulls.Edit(g.owner, g.repo, number,
+func (g *Gateway) SetPullRequestBase(ctx context.Context, number int, base string) error {
+	_, _, err := g.pulls.Edit(ctx, g.owner, g.repo, number,
 		&github.PullRequest{Base: &github.PullRequestBranch{Ref: &base}})
 	if err != nil {
 		return fmt.Errorf(
@@ -125,8 +135,8 @@ func (g *Gateway) SetPullRequestBase(number int, base string) error {
 
 // SquashPullRequest merges given pull request. The title and description are
 // used as-is for the commit message.
-func (g *Gateway) SquashPullRequest(pr *github.PullRequest) error {
-	result, _, err := g.pulls.Merge(g.owner, g.repo, *pr.Number, *pr.Body,
+func (g *Gateway) SquashPullRequest(ctx context.Context, pr *github.PullRequest) error {
+	result, _, err := g.pulls.Merge(ctx, g.owner, g.repo, *pr.Number, *pr.Body,
 		&github.PullRequestOptions{CommitTitle: *pr.Title, MergeMethod: "squash"})
 	if err != nil {
 		return fmt.Errorf("failed to merge %v: %v", g.urlFor(*pr.Number), err)
@@ -140,8 +150,8 @@ func (g *Gateway) SquashPullRequest(pr *github.PullRequest) error {
 }
 
 // DeleteBranch deletes the given remote branch.
-func (g *Gateway) DeleteBranch(name string) error {
-	if _, err := g.git.DeleteRef(g.owner, g.repo, "heads/"+name); err != nil {
+func (g *Gateway) DeleteBranch(ctx context.Context, name string) error {
+	if _, err := g.git.DeleteRef(ctx, g.owner, g.repo, "heads/"+name); err != nil {
 		return fmt.Errorf("failed to delete remote branch %v: %v", name, err)
 	}
 	return nil

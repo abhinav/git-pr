@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -30,6 +31,8 @@ func newLandCommand(cbuild cli.ConfigBuilder) flags.Commander {
 }
 
 func (l *landCmd) Execute([]string) error {
+	ctx := context.Background()
+
 	cfg, err := l.getConfig()
 	if err != nil {
 		return err
@@ -53,7 +56,7 @@ func (l *landCmd) Execute([]string) error {
 		req.LocalBranch = out
 	}
 
-	prs, err := cfg.GitHub().ListPullRequestsByHead("", branch)
+	prs, err := cfg.GitHub().ListPullRequestsByHead(ctx, "", branch)
 	if err != nil {
 		return err
 	}
@@ -67,7 +70,7 @@ func (l *landCmd) Execute([]string) error {
 	}
 
 	log.Println("Landing", *req.PullRequest.HTMLURL)
-	res, err := cfg.Service.Land(&req)
+	res, err := cfg.Service.Land(ctx, &req)
 	if err != nil {
 		return fmt.Errorf("failed to land %v: %v", *req.PullRequest.HTMLURL, err)
 	}
