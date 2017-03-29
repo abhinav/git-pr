@@ -22,11 +22,15 @@ func TestRebaseCmd(t *testing.T) {
 		// Test description
 		Desc string
 
-		Base string
-		Head string
+		Base     string
+		Head     string
+		OnlyMine bool
 
 		// Name of the current branch (if requested)
 		CurrentBranch string
+
+		// Name of the current GitHub user
+		GitHubUser string
 
 		// Map of branch name to pull requests with that head.
 		PullRequestsByHead prMap
@@ -133,6 +137,47 @@ func TestRebaseCmd(t *testing.T) {
 			},
 			ReturnRebaseResponse: &service.RebaseResponse{},
 		},
+		{
+			Desc:          "only mine",
+			CurrentBranch: "feature6",
+			OnlyMine:      true,
+			GitHubUser:    "foo",
+			PullRequestsByHead: prMap{
+				"feature6": {
+					{Head: &github.PullRequestBranch{Ref: ptr.String("feature6")}},
+				},
+			},
+			PullRequestsByBase: prMap{
+				"feature6": {
+					{
+						HTMLURL: ptr.String("x"),
+						User:    &github.User{Login: ptr.String("foo")},
+					},
+					{
+						HTMLURL: ptr.String("y"),
+						User:    &github.User{Login: ptr.String("bar")},
+					},
+					{
+						HTMLURL: ptr.String("z"),
+						User:    &github.User{Login: ptr.String("foo")},
+					},
+				},
+			},
+			ExpectRebaseRequest: &service.RebaseRequest{
+				PullRequests: []*github.PullRequest{
+					{
+						HTMLURL: ptr.String("x"),
+						User:    &github.User{Login: ptr.String("foo")},
+					},
+					{
+						HTMLURL: ptr.String("z"),
+						User:    &github.User{Login: ptr.String("foo")},
+					},
+				},
+				Base: "feature6",
+			},
+			ReturnRebaseResponse: &service.RebaseResponse{},
+		},
 	}
 
 	for _, tt := range tests {
@@ -146,13 +191,18 @@ func TestRebaseCmd(t *testing.T) {
 
 			cb := &fakeConfigBuilder{
 				ConfigBuilder: clitest.ConfigBuilder{
-					Git:    git,
-					GitHub: github,
-					Repo:   &repo.Repo{Owner: "foo", Name: "bar"},
+					Git:        git,
+					GitHub:     github,
+					Repo:       &repo.Repo{Owner: "foo", Name: "bar"},
+					GitHubUser: tt.GitHubUser,
 				},
 				Service: svc,
 			}
-			cmd := rebaseCmd{getConfig: cb.Build, Base: tt.Base}
+			cmd := rebaseCmd{
+				getConfig: cb.Build,
+				Base:      tt.Base,
+				OnlyMine:  tt.OnlyMine,
+			}
 			cmd.Args.Branch = tt.Head
 
 			// Always return the current branch if requested.

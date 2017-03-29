@@ -22,6 +22,7 @@ type Config interface {
 	Git() gateway.Git
 	Repo() *repo.Repo
 	GitHub() gateway.GitHub
+	CurrentGitHubUser() string
 }
 
 // ConfigBuilder builds a configuration lazily.
@@ -122,6 +123,10 @@ func (g *globalConfig) Build() (_ Config, err error) {
 
 func (g *globalConfig) Repo() *repo.Repo {
 	return g.repo
+}
+
+func (g *globalConfig) CurrentGitHubUser() string {
+	return g.GitHubUser
 }
 
 func (g *globalConfig) GitHub() gateway.GitHub {

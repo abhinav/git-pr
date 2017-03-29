@@ -12,8 +12,9 @@ import (
 )
 
 type rebaseCmd struct {
-	Base string `long:"onto" value-name:"BASE" description:"Name of the base branch. If unspecified, only the dependents of the current branch will be rebased onto it."`
-	Args struct {
+	OnlyMine bool   `long:"only-mine" description:"IF set, only PRs owned by the current user will be rebased."`
+	Base     string `long:"onto" value-name:"BASE" description:"Name of the base branch. If unspecified, only the dependents of the current branch will be rebased onto it."`
+	Args     struct {
 		Branch string `positional-arg-name:"BRANCH" description:"Name of the branch to rebase. Defaults to the branch in the current directory."`
 	} `positional-args:"yes"`
 
@@ -65,6 +66,16 @@ func (r *rebaseCmd) Execute([]string) error {
 		req = service.RebaseRequest{PullRequests: dependents, Base: head}
 	} else {
 		req = service.RebaseRequest{PullRequests: prs, Base: r.Base}
+	}
+
+	if r.OnlyMine {
+		prs := req.PullRequests[:0]
+		for _, pr := range req.PullRequests {
+			if pr.User.GetLogin() == cfg.CurrentGitHubUser() {
+				prs = append(prs, pr)
+			}
+		}
+		req.PullRequests = prs
 	}
 
 	log.Println("Rebasing:")

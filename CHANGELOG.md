@@ -1,6 +1,13 @@
 Releases
 ========
 
+v0.5.0 (unreleased)
+-------------------
+
+-   `git pr rebase` now supports an `--only-mine` flag to rebase only pull
+    requests owned by the current user.
+
+
 v0.4.3 (2017-03-08)
 -------------------
 

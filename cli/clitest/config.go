@@ -8,9 +8,10 @@ import (
 
 // ConfigBuilder may be used to build a cli.Config from static values.
 type ConfigBuilder struct {
-	Git    gateway.Git
-	Repo   *repo.Repo
-	GitHub gateway.GitHub
+	Git        gateway.Git
+	Repo       *repo.Repo
+	GitHub     gateway.GitHub
+	GitHubUser string
 }
 
 // Build the cli.Config. This function may also be used as a
@@ -29,6 +30,10 @@ func (c *config) Git() gateway.Git {
 
 func (c *config) Repo() *repo.Repo {
 	return c.data.Repo
+}
+
+func (c *config) CurrentGitHubUser() string {
+	return c.data.GitHubUser
 }
 
 func (c *config) GitHub() gateway.GitHub {
