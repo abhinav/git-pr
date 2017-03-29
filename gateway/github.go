@@ -13,6 +13,10 @@ const (
 	// PullRequestApproved indicates that a pull request was accepted.
 	PullRequestApproved PullRequestReviewState = "APPROVED"
 
+	// PullRequestCommented indicates that someone commented on a pull
+	// requestest without an explicit approval or changes-requested.
+	PullRequestCommented PullRequestReviewState = "COMMENTED"
+
 	// PullRequestChangesRequested indicates that changes were requested for a
 	// pull request.
 	PullRequestChangesRequested PullRequestReviewState = "CHANGES_REQUESTED"

@@ -6,6 +6,9 @@ v0.5.0 (unreleased)
 
 -   `git pr rebase` now supports an `--only-mine` flag to rebase only pull
     requests owned by the current user.
+-   `git pr land` now verifies that a pull request passes all checks before
+    landing it. This includes verifying that all builds have succeeded and that
+    there are no blocking reviews.
 
 
 v0.4.3 (2017-03-08)

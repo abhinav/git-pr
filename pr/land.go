@@ -2,14 +2,101 @@ package pr
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"sync"
 
+	"github.com/abhinav/git-fu/gateway"
 	"github.com/abhinav/git-fu/service"
+
+	"github.com/google/go-github/github"
+	"go.uber.org/multierr"
 )
+
+func (s *Service) checkApproved(ctx context.Context, pr *github.PullRequest) error {
+	reviews, err := s.GitHub.ListPullRequestReviews(ctx, pr.GetNumber())
+	if err != nil {
+		return err
+	}
+
+	for _, review := range reviews {
+		if review.Status != gateway.PullRequestChangesRequested {
+			continue
+		}
+
+		err = multierr.Append(err,
+			fmt.Errorf("%v has requested changes on %v", review.User, pr.GetHTMLURL()))
+	}
+
+	return err
+}
+
+func (s *Service) checkBuilt(ctx context.Context, ref string) error {
+	status, err := s.GitHub.GetBuildStatus(ctx, ref)
+	if err != nil {
+		return err
+	}
+
+	if status.State == gateway.BuildSuccess {
+		return nil
+	}
+
+	for _, s := range status.Statuses {
+		var msg string
+		switch s.State {
+		case gateway.BuildSuccess:
+			continue
+		case gateway.BuildPending:
+			msg = fmt.Sprintf("%v is still running", s.Name)
+		default:
+			msg = fmt.Sprintf("%v state is %v: %v", s.Name, s.State, s.Message)
+		}
+		err = multierr.Append(err, errors.New(msg))
+	}
+
+	return err
+}
+
+func (s *Service) checkLandable(ctx context.Context, pr *github.PullRequest) error {
+	var (
+		mu     sync.Mutex
+		wg     sync.WaitGroup
+		errors error
+	)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		if err := s.checkApproved(ctx, pr); err != nil {
+			mu.Lock()
+			errors = multierr.Append(errors, err)
+			mu.Unlock()
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		if err := s.checkBuilt(ctx, pr.Head.GetRef()); err != nil {
+			mu.Lock()
+			errors = multierr.Append(errors, err)
+			mu.Unlock()
+		}
+	}()
+
+	wg.Wait()
+	return errors
+}
 
 // Land the given pull request.
 func (s *Service) Land(ctx context.Context, req *service.LandRequest) (*service.LandResponse, error) {
 	pr := req.PullRequest
+	if err := s.checkLandable(ctx, pr); err != nil {
+		return nil, fmt.Errorf("cannot land %v: %+v", pr.GetHTMLURL(), err)
+	}
+
 	if err := UpdateMessage(req.Editor, pr); err != nil {
 		return nil, err
 	}
