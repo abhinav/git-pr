@@ -246,6 +246,17 @@ func (_mr *_MockGitHubRecorder) IsOwned(arg0, arg1 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "IsOwned", arg0, arg1)
 }
 
+func (_m *MockGitHub) ListPullRequestReviews(_param0 context.Context, _param1 int) ([]*gateway.PullRequestReview, error) {
+	ret := _m.ctrl.Call(_m, "ListPullRequestReviews", _param0, _param1)
+	ret0, _ := ret[0].([]*gateway.PullRequestReview)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockGitHubRecorder) ListPullRequestReviews(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListPullRequestReviews", arg0, arg1)
+}
+
 func (_m *MockGitHub) ListPullRequestsByBase(_param0 context.Context, _param1 string) ([]*github.PullRequest, error) {
 	ret := _m.ctrl.Call(_m, "ListPullRequestsByBase", _param0, _param1)
 	ret0, _ := ret[0].([]*github.PullRequest)

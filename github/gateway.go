@@ -10,18 +10,20 @@ import (
 	"github.com/google/go-github/github"
 )
 
-// gitService is the GitHub Git service.
-type gitService interface {
+//go:generate mockgen -package github -destination=mocks_test.go github.com/abhinav/git-fu/github GitService,PullRequestsService
+
+// GitService is a subset of the GitHub Git API.
+type GitService interface {
 	DeleteRef(
 		ctx context.Context,
 		owner string, repo string, ref string,
 	) (*github.Response, error)
 }
 
-var _ gitService = (*github.GitService)(nil)
+var _ GitService = (*github.GitService)(nil)
 
-// pullRequestsService is the GitHub PullRequests client.
-type pullRequestsService interface {
+// PullRequestsService is a subset of the GitHub Pull Requests API.
+type PullRequestsService interface {
 	Edit(
 		ctx context.Context,
 		owner string, repo string, number int,
@@ -38,6 +40,11 @@ type pullRequestsService interface {
 		owner string, repo string, opt *github.PullRequestListOptions,
 	) ([]*github.PullRequest, *github.Response, error)
 
+	ListReviews(
+		ctx context.Context,
+		owner, repo string, number int,
+	) ([]*github.PullRequestReview, *github.Response, error)
+
 	Merge(
 		ctx context.Context,
 		owner string, repo string, number int,
@@ -46,14 +53,14 @@ type pullRequestsService interface {
 	) (*github.PullRequestMergeResult, *github.Response, error)
 }
 
-var _ pullRequestsService = (*github.PullRequestsService)(nil)
+var _ PullRequestsService = (*github.PullRequestsService)(nil)
 
 // Gateway is a GitHub gateway that makes actual requests to GitHub.
 type Gateway struct {
 	owner string
 	repo  string
-	pulls pullRequestsService
-	git   gitService
+	pulls PullRequestsService
+	git   GitService
 }
 
 var _ gateway.GitHub = (*Gateway)(nil)
@@ -76,6 +83,23 @@ func (g *Gateway) urlFor(number int) string {
 // IsOwned checks if this branch is local to this repository.
 func (g *Gateway) IsOwned(ctx context.Context, br *github.PullRequestBranch) bool {
 	return *br.Repo.Owner.Login == g.owner && *br.Repo.Name == g.repo
+}
+
+// ListPullRequestReviews lists reviews for a pull request.
+func (g *Gateway) ListPullRequestReviews(ctx context.Context, number int) ([]*gateway.PullRequestReview, error) {
+	reviews, _, err := g.pulls.ListReviews(ctx, g.owner, g.repo, number)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list reviews for %v: %v", g.urlFor(number), err)
+	}
+
+	result := make([]*gateway.PullRequestReview, len(reviews))
+	for i, r := range reviews {
+		result[i] = &gateway.PullRequestReview{
+			User:   r.User.GetLogin(),
+			Status: gateway.PullRequestReviewState(r.GetState()),
+		}
+	}
+	return result, nil
 }
 
 // ListPullRequestsByHead lists pull requests with the given head.
