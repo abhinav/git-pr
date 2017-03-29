@@ -55,12 +55,23 @@ type PullRequestsService interface {
 
 var _ PullRequestsService = (*github.PullRequestsService)(nil)
 
+// RepositoriesService is a subset of the GitHub Repositories API.
+type RepositoriesService interface {
+	GetCombinedStatus(ctx context.Context,
+		owner, repo, ref string, opt *github.ListOptions,
+	) (*github.CombinedStatus, *github.Response, error)
+}
+
+var _ RepositoriesService = (*github.RepositoriesService)(nil)
+
 // Gateway is a GitHub gateway that makes actual requests to GitHub.
 type Gateway struct {
 	owner string
 	repo  string
-	pulls PullRequestsService
+
 	git   GitService
+	pulls PullRequestsService
+	repos RepositoriesService
 }
 
 var _ gateway.GitHub = (*Gateway)(nil)
@@ -72,6 +83,7 @@ func NewGatewayForRepository(client *github.Client, repo *repo.Repo) *Gateway {
 		owner: repo.Owner,
 		repo:  repo.Name,
 		pulls: client.PullRequests,
+		repos: client.Repositories,
 		git:   client.Git,
 	}
 }
@@ -100,6 +112,25 @@ func (g *Gateway) ListPullRequestReviews(ctx context.Context, number int) ([]*ga
 		}
 	}
 	return result, nil
+}
+
+// GetBuildStatus gets the build status for the given ref.
+func (g *Gateway) GetBuildStatus(ctx context.Context, ref string) (*gateway.BuildStatus, error) {
+	s, _, err := g.repos.GetCombinedStatus(ctx, g.owner, g.repo, ref, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get build status for %q: %v", ref, err)
+	}
+
+	bs := gateway.BuildStatus{State: gateway.BuildState(s.GetState())}
+	for _, status := range s.Statuses {
+		bs.Statuses = append(bs.Statuses, &gateway.BuildContextStatus{
+			Name:    status.GetContext(),
+			Message: status.GetDescription(),
+			State:   gateway.BuildState(status.GetState()),
+		})
+	}
+
+	return &bs, nil
 }
 
 // ListPullRequestsByHead lists pull requests with the given head.

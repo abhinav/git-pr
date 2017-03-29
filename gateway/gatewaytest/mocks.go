@@ -225,6 +225,17 @@ func (_mr *_MockGitHubRecorder) DeleteBranch(arg0, arg1 interface{}) *gomock.Cal
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeleteBranch", arg0, arg1)
 }
 
+func (_m *MockGitHub) GetBuildStatus(_param0 context.Context, _param1 string) (*gateway.BuildStatus, error) {
+	ret := _m.ctrl.Call(_m, "GetBuildStatus", _param0, _param1)
+	ret0, _ := ret[0].(*gateway.BuildStatus)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockGitHubRecorder) GetBuildStatus(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetBuildStatus", arg0, arg1)
+}
+
 func (_m *MockGitHub) GetPullRequestPatch(_param0 context.Context, _param1 int) (string, error) {
 	ret := _m.ctrl.Call(_m, "GetPullRequestPatch", _param0, _param1)
 	ret0, _ := ret[0].(string)
