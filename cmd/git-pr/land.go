@@ -19,6 +19,8 @@ type landCmd struct {
 		Branch string `positional-arg-name:"BRANCH" description:"Name of the branch to land. Defaults to the branch in the current directory."`
 	} `positional-args:"yes"`
 
+	NoCheck bool `long:"no-check" description:"Disable verifying that the PR can be landed."`
+
 	getConfig configBuilder
 	getEditor func(string) (editor.Editor, error)
 }
@@ -43,7 +45,10 @@ func (l *landCmd) Execute([]string) error {
 		return err
 	}
 
-	req := service.LandRequest{Editor: editor}
+	req := service.LandRequest{
+		Editor:  editor,
+		NoCheck: l.NoCheck,
+	}
 
 	// TODO: accept other inputs for the PR to land
 	branch := l.Args.Branch

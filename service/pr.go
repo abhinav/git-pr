@@ -19,6 +19,9 @@ type LandRequest struct {
 
 	// Editor to use for editing the commit message.
 	Editor editor.Editor
+
+	// Don't verify that the diff can be landed.
+	NoCheck bool
 }
 
 // LandResponse is the response of a land request.

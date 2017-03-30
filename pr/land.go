@@ -93,8 +93,10 @@ func (s *Service) checkLandable(ctx context.Context, pr *github.PullRequest) err
 // Land the given pull request.
 func (s *Service) Land(ctx context.Context, req *service.LandRequest) (*service.LandResponse, error) {
 	pr := req.PullRequest
-	if err := s.checkLandable(ctx, pr); err != nil {
-		return nil, fmt.Errorf("cannot land %v: %+v", pr.GetHTMLURL(), err)
+	if !req.NoCheck {
+		if err := s.checkLandable(ctx, pr); err != nil {
+			return nil, fmt.Errorf("cannot land %v: %+v", pr.GetHTMLURL(), err)
+		}
 	}
 
 	if err := UpdateMessage(req.Editor, pr); err != nil {
