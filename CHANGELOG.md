@@ -8,7 +8,7 @@ v0.5.0 (unreleased)
     requests owned by the current user.
 -   `git pr land` now verifies that a pull request passes all checks before
     landing it. This includes verifying that all builds have succeeded and that
-    there are no blocking reviews.
+    there are no blocking reviews. Use `--no-check` to skip this.
 
 
 v0.4.3 (2017-03-08)
