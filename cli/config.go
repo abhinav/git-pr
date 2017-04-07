@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -30,7 +31,7 @@ type ConfigBuilder func() (Config, error)
 
 type globalConfig struct {
 	RepoName    string `short:"r" long:"repo" value-name:"OWNER/REPO" description:"Name of the GitHub repository in the format 'owner/repo'. Defaults to the repository for the current directory."`
-	GitHubUser  string `short:"u" long:"user" value-name:"USERNAME" env:"GITHUB_USER" required:"yes" description:"GitHub username."`
+	GitHubUser  string `short:"u" long:"user" value-name:"USERNAME" env:"GITHUB_USER" description:"GitHub username."`
 	GitHubToken string `short:"t" long:"token" env:"GITHUB_TOKEN" value-name:"TOKEN" description:"GitHub token used to make requests."`
 
 	token  string
@@ -96,6 +97,12 @@ func (g *globalConfig) askForToken() (string, error) {
 
 // globalConfig.Build is a ConfigBuilder
 func (g *globalConfig) Build() (_ Config, err error) {
+	if g.GitHubUser == "" {
+		return nil, errors.New(
+			"please provide a GitHub username using the -u/--user flag " +
+				"or by setting the GITHUB_USER environment variable")
+	}
+
 	git, err := g.buildGit()
 	if err != nil {
 		return nil, err
