@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"sync"
 
 	"github.com/abhinav/git-fu/gateway"
@@ -19,13 +20,28 @@ func (s *Service) checkApproved(ctx context.Context, pr *github.PullRequest) err
 		return err
 	}
 
+	changesRequestedBy := make(map[string]struct{})
 	for _, review := range reviews {
-		if review.Status != gateway.PullRequestChangesRequested {
-			continue
+		if review.Status == gateway.PullRequestChangesRequested {
+			changesRequestedBy[review.User] = struct{}{}
+		} else {
+			delete(changesRequestedBy, review.User)
 		}
+	}
 
+	if len(changesRequestedBy) == 0 {
+		return nil
+	}
+
+	users := make([]string, 0, len(changesRequestedBy))
+	for u := range changesRequestedBy {
+		users = append(users, u)
+	}
+	sort.Strings(users)
+
+	for _, u := range users {
 		err = multierr.Append(err,
-			fmt.Errorf("%v has requested changes on %v", review.User, pr.GetHTMLURL()))
+			fmt.Errorf("%v has requested changes on %v", u, pr.GetHTMLURL()))
 	}
 
 	return err
