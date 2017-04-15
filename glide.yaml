@@ -8,7 +8,7 @@ import:
 - package: github.com/jessevdk/go-flags
 - package: github.com/zalando/go-keyring
 - package: go.uber.org/multierr
-  version: master
+  version: ~0.2
 testImport:
 - package: github.com/golang/mock
   subpackages:

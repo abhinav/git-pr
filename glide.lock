@@ -1,8 +1,8 @@
-hash: 256da848ea3e206955a39a100c06162017a3ecd84ca835c57c74938be875bd5e
-updated: 2017-03-24T14:36:07.532232807-07:00
+hash: 2573d878efc6f70ebe7dc8e046b0283bb5b4c0dcd3d558a4bad60ba275b2309f
+updated: 2017-04-15T15:38:25.864110416-07:00
 imports:
 - name: github.com/danieljoos/wincred
-  version: cbe0c0023057b04ad78c6de5e8cb85ea9b5315be
+  version: 412b574fb496839b312a75fba146bd32a89001cf
 - name: github.com/godbus/dbus
   version: b038411ec341afd52c6d36d8baae92a29e6e8a9e
 - name: github.com/golang/mock
@@ -10,11 +10,11 @@ imports:
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
-  version: c9c7427a2a70d2eb3bafa0ab2dc163e45f143317
+  version: 2bba0603135d7d7f5cb73b2125beeda19c09f4ef
   subpackages:
   - proto
 - name: github.com/google/go-github
-  version: d683a1c6198d75c6be7a7ab5e2f9834cb6408834
+  version: de33c46a823d3f723514fc5333b75ef2e937b7df
   subpackages:
   - github
 - name: github.com/google/go-querystring
@@ -27,18 +27,20 @@ imports:
   version: dcbcb8215e7449155ca2bd5b4fc67e0b91e175f1
   subpackages:
   - secret_service
+- name: go.uber.org/atomic
+  version: 4e336646b2ef9fc6e47be8e21594178f98e5ebcf
 - name: go.uber.org/multierr
-  version: de6740a55f8d778e53755317dc50aae950c760de
+  version: a3d1fc1f1316d4132fc61f4ea1159ae0613fb474
 - name: golang.org/x/net
-  version: 3e967e1d28d2c9c06e749dc2bdc14b04df89e689
+  version: 5602c733f70afc6dcec6766be0d5034d4c4f14de
   subpackages:
   - context
 - name: golang.org/x/oauth2
-  version: 7fdf09982454086d5570c7db3e11f360194830ca
+  version: a6bd8cefa1811bd24b86f8902872e4e8225f74c4
   subpackages:
   - internal
 - name: google.golang.org/appengine
-  version: 56d253d1dd14aa01937e12c73a0971bcfd797ff2
+  version: 170382fa85b10b94728989dfcf6cc818b335c952
   subpackages:
   - internal
   - internal/app_identity
@@ -51,11 +53,11 @@ imports:
   - urlfetch
 testImports:
 - name: github.com/davecgh/go-spew
-  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
   subpackages:
   - spew
 - name: github.com/pmezard/go-difflib
-  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
   - difflib
 - name: github.com/stretchr/testify
