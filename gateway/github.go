@@ -17,6 +17,10 @@ const (
 	// requestest without an explicit approval or changes-requested.
 	PullRequestCommented PullRequestReviewState = "COMMENTED"
 
+	// PullRequestReviewDismissed indicates that the review of a pull request
+	// was dismissed.
+	PullRequestReviewDismissed PullRequestReviewState = "DISMISSED"
+
 	// PullRequestChangesRequested indicates that changes were requested for a
 	// pull request.
 	PullRequestChangesRequested PullRequestReviewState = "CHANGES_REQUESTED"
