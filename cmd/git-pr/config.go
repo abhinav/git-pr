@@ -22,11 +22,16 @@ func newConfigBuilder(cb cli.ConfigBuilder) configBuilder {
 			return config{}, err
 		}
 
+		hub := cfg.GitHub()
 		return config{
 			Config: cfg,
 			Service: &pr.Service{
-				GitHub: cfg.GitHub(),
+				GitHub: hub,
 				Git:    cfg.Git(),
+				LandCheck: pr.MultiLandCheck{
+					&pr.ApprovalCheck{Review: &pr.ReviewService{GitHub: hub}},
+					&pr.BuildCheck{GitHub: hub},
+				},
 			},
 		}, nil
 	}

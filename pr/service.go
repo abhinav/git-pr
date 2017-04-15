@@ -7,8 +7,9 @@ import (
 
 // Service TODO
 type Service struct {
-	GitHub gateway.GitHub
-	Git    gateway.Git
+	GitHub    gateway.GitHub
+	Git       gateway.Git
+	LandCheck LandCheck
 }
 
 var _ service.PR = (*Service)(nil)
