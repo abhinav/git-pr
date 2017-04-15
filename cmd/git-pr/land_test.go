@@ -25,6 +25,7 @@ func TestLandCmd(t *testing.T) {
 
 		Head          string
 		CurrentBranch string
+		NoCheck       bool
 
 		// Map of branch name to pull requests with that head.
 		PullRequestsByHead prMap
@@ -82,6 +83,22 @@ func TestLandCmd(t *testing.T) {
 			},
 			ReturnLandResponse: &service.LandResponse{},
 		},
+		{
+			Desc:          "no check",
+			CurrentBranch: "feature5",
+			PullRequestsByHead: prMap{
+				"feature5": {{HTMLURL: ptr.String("feature5")}},
+			},
+			NoCheck: true,
+			ExpectLandRequest: &service.LandRequest{
+				NoCheck:     true,
+				LocalBranch: "feature5",
+				PullRequest: &github.PullRequest{
+					HTMLURL: ptr.String("feature5"),
+				},
+			},
+			ReturnLandResponse: &service.LandResponse{},
+		},
 	}
 
 	for _, tt := range tests {
@@ -103,6 +120,7 @@ func TestLandCmd(t *testing.T) {
 				Service: svc,
 			}
 			cmd := landCmd{
+				NoCheck:   tt.NoCheck,
 				getConfig: cb.Build,
 				getEditor: func(string) (editor.Editor, error) { return ed, nil },
 			}
