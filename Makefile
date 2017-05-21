@@ -2,7 +2,7 @@ PACKAGES = $(shell glide nv)
 
 .PHONY: test
 test:
-	go test -v $(PACKAGES)
+	go test -race -v $(PACKAGES)
 
 .PHONY: generate
 generate:
