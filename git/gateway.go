@@ -152,13 +152,13 @@ func (g *Gateway) Checkout(name string) error {
 
 // Fetch a git ref
 func (g *Gateway) Fetch(req *gateway.FetchRequest) error {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
 	ref := req.RemoteRef
 	if req.LocalRef != "" {
 		ref = ref + ":" + req.LocalRef
 	}
+
+	g.mu.Lock()
+	defer g.mu.Unlock()
 
 	if err := g.cmd("fetch", req.Remote, ref).Run(); err != nil {
 		return fmt.Errorf("failed to fetch %q from %q: %v", ref, req.Remote, err)
@@ -172,9 +172,6 @@ func (g *Gateway) Push(req *gateway.PushRequest) error {
 		return nil
 	}
 
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
 	args := append(make([]string, 0, len(req.Refs)+2), "push")
 	if req.Force {
 		args = append(args, "-f")
@@ -187,6 +184,9 @@ func (g *Gateway) Push(req *gateway.PushRequest) error {
 		}
 		args = append(args, ref)
 	}
+
+	g.mu.Lock()
+	defer g.mu.Unlock()
 
 	if err := g.cmd(args...).Run(); err != nil {
 		return fmt.Errorf("failed to push refs to %q: %v", req.Remote, err)
@@ -207,9 +207,6 @@ func (g *Gateway) Pull(remote, name string) error {
 
 // Rebase a branch.
 func (g *Gateway) Rebase(req *gateway.RebaseRequest) error {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
 	var _args [5]string
 
 	args := append(_args[:0], "rebase")
@@ -220,6 +217,9 @@ func (g *Gateway) Rebase(req *gateway.RebaseRequest) error {
 		args = append(args, req.From)
 	}
 	args = append(args, req.Branch)
+
+	g.mu.Lock()
+	defer g.mu.Unlock()
 
 	if err := g.cmd(args...).Run(); err != nil {
 		return multierr.Append(
@@ -234,13 +234,13 @@ func (g *Gateway) Rebase(req *gateway.RebaseRequest) error {
 
 // ResetBranch resets the given branch to the given head.
 func (g *Gateway) ResetBranch(branch, head string) error {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
 	curr, err := g.CurrentBranch()
 	if err != nil {
 		return fmt.Errorf("could not reset %q to %q: %v", branch, head, err)
 	}
+
+	g.mu.Lock()
+	defer g.mu.Unlock()
 
 	if curr == branch {
 		err = g.cmd("reset", "--hard", head).Run()
