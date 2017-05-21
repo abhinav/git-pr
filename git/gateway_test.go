@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPushManyNoRefs(t *testing.T) {
+func TestPushNoRefs(t *testing.T) {
 	dir, err := ioutil.TempDir("", "git-pr")
 	require.NoError(t, err, "couldn't create a temporary directory")
 	defer os.RemoveAll(dir)
@@ -27,7 +27,7 @@ func TestPushManyNoRefs(t *testing.T) {
 
 	// We don't have any remotes but that isn't a problem simply because this
 	// operation shouldn't do *anything* at all
-	err = gw.PushMany(&gateway.PushManyRequest{
+	err = gw.Push(&gateway.PushRequest{
 		Remote: "origin",
 		Refs:   make(map[string]string),
 		Force:  true,

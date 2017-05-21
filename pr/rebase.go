@@ -56,7 +56,7 @@ func (s *Service) Rebase(ctx context.Context, req *service.RebaseRequest) (_ *se
 		pushRefs[r.LocalBranch] = *head.Ref
 	}
 
-	if err := s.Git.PushMany(&gateway.PushManyRequest{
+	if err := s.Git.Push(&gateway.PushRequest{
 		Remote: "origin",
 		Force:  true,
 		Refs:   pushRefs,

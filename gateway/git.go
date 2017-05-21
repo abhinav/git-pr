@@ -7,16 +7,8 @@ type FetchRequest struct {
 	LocalRef  string // name of the ref locally
 }
 
-// PushRequest is a request to push a branch.
+// PushRequest is a request to push refs to a remote.
 type PushRequest struct {
-	Remote    string
-	LocalRef  string
-	RemoteRef string
-	Force     bool
-}
-
-// PushManyRequest is a request to push many refs in one go.
-type PushManyRequest struct {
 	Remote string
 	// Mapping of local ref to remote ref. Remote ref may be empty to indicate
 	// that the local ref name should be used.
@@ -50,9 +42,11 @@ type Git interface {
 	// Create a branch with the given name and head but don't switch to it.
 	CreateBranch(name, head string) error
 
-	// Creates and switches to a local branch with the given name at the given
-	// ref.
-	CreateBranchAndSwitch(name, head string) error
+	// Creates a branch with the given name at the given head and switches to
+	// it.
+	//
+	// An error is returned if a branch with the same name already exists.
+	CreateBranchAndCheckout(name, head string) error
 
 	// Switches branches.
 	Checkout(name string) error
@@ -60,16 +54,14 @@ type Git interface {
 	// Fetch a ref
 	Fetch(*FetchRequest) error
 
-	// Push a branch
-	Push(*PushRequest) error
-
 	// Push many branches
-	PushMany(*PushManyRequest) error
+	Push(*PushRequest) error
 
 	// Rebase a branch
 	Rebase(*RebaseRequest) error
 
-	// Reset the given branch to the given head.
+	// Reset the given branch to the given head, overwriting the working tree
+	// while at it.
 	ResetBranch(branch, head string) error
 
 	// Get the SHA1 hash for the given ref.
@@ -77,9 +69,6 @@ type Git interface {
 
 	// Pulls a branch from a specific remote.
 	Pull(remote, name string) error
-
-	// Applies the given patch using git-am.
-	ApplyPatches(patches string) error
 
 	// RemoteURL gets the URL for the given remote.
 	RemoteURL(name string) (string, error)

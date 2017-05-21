@@ -79,6 +79,19 @@ func (g *Gateway) DoesBranchExist(name string) bool {
 	return err == nil
 }
 
+// CreateBranchAndCheckout creates a branch with the given name and head and
+// switches to it.
+func (g *Gateway) CreateBranchAndCheckout(name, head string) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	if err := g.cmd("checkout", "-b", name, head).Run(); err != nil {
+		return fmt.Errorf(
+			"failed to create and checkout branch %q at ref %q: %v", name, head, err)
+	}
+	return nil
+}
+
 // CreateBranch creates a branch with the given name and head but does not
 // check it out.
 func (g *Gateway) CreateBranch(name, head string) error {
@@ -86,17 +99,6 @@ func (g *Gateway) CreateBranch(name, head string) error {
 	defer g.mu.Unlock()
 
 	if err := g.cmd("branch", name, head).Run(); err != nil {
-		return fmt.Errorf("failed to create branch %q at ref %q: %v", name, head, err)
-	}
-	return nil
-}
-
-// CreateBranchAndSwitch checks out a new branch with the given name and head.
-func (g *Gateway) CreateBranchAndSwitch(name, head string) error {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
-	if err := g.cmd("checkout", "-b", name, head).Run(); err != nil {
 		return fmt.Errorf("failed to create branch %q at ref %q: %v", name, head, err)
 	}
 	return nil
@@ -164,24 +166,8 @@ func (g *Gateway) Fetch(req *gateway.FetchRequest) error {
 	return nil
 }
 
-// Push a branch
+// Push pushes refs to a remote.
 func (g *Gateway) Push(req *gateway.PushRequest) error {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
-	err := g.PushMany(&gateway.PushManyRequest{
-		Remote: req.Remote,
-		Force:  req.Force,
-		Refs:   map[string]string{req.LocalRef: req.RemoteRef},
-	})
-	if err != nil {
-		err = fmt.Errorf("failed to push %q to %q: %v", req.LocalRef, req.Remote, err)
-	}
-	return err
-}
-
-// PushMany pushes multiple refs to a remote
-func (g *Gateway) PushMany(req *gateway.PushManyRequest) error {
 	if len(req.Refs) == 0 {
 		return nil
 	}
@@ -215,19 +201,6 @@ func (g *Gateway) Pull(remote, name string) error {
 
 	if err := g.cmd("pull", remote, name).Run(); err != nil {
 		return fmt.Errorf("failed to pull %q from %q: %v", name, remote, err)
-	}
-	return nil
-}
-
-// ApplyPatches applies the given patch.
-func (g *Gateway) ApplyPatches(patches string) error {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
-	cmd := g.cmd("am")
-	cmd.Stdin = strings.NewReader(patches)
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to apply patches: %v", err)
 	}
 	return nil
 }

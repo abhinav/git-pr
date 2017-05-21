@@ -31,16 +31,6 @@ func (_m *MockGit) EXPECT() *_MockGitRecorder {
 	return _m.recorder
 }
 
-func (_m *MockGit) ApplyPatches(_param0 string) error {
-	ret := _m.ctrl.Call(_m, "ApplyPatches", _param0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-func (_mr *_MockGitRecorder) ApplyPatches(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "ApplyPatches", arg0)
-}
-
 func (_m *MockGit) Checkout(_param0 string) error {
 	ret := _m.ctrl.Call(_m, "Checkout", _param0)
 	ret0, _ := ret[0].(error)
@@ -61,14 +51,14 @@ func (_mr *_MockGitRecorder) CreateBranch(arg0, arg1 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "CreateBranch", arg0, arg1)
 }
 
-func (_m *MockGit) CreateBranchAndSwitch(_param0 string, _param1 string) error {
-	ret := _m.ctrl.Call(_m, "CreateBranchAndSwitch", _param0, _param1)
+func (_m *MockGit) CreateBranchAndCheckout(_param0 string, _param1 string) error {
+	ret := _m.ctrl.Call(_m, "CreateBranchAndCheckout", _param0, _param1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-func (_mr *_MockGitRecorder) CreateBranchAndSwitch(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "CreateBranchAndSwitch", arg0, arg1)
+func (_mr *_MockGitRecorder) CreateBranchAndCheckout(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "CreateBranchAndCheckout", arg0, arg1)
 }
 
 func (_m *MockGit) CurrentBranch() (string, error) {
@@ -140,16 +130,6 @@ func (_m *MockGit) Push(_param0 *gateway.PushRequest) error {
 
 func (_mr *_MockGitRecorder) Push(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "Push", arg0)
-}
-
-func (_m *MockGit) PushMany(_param0 *gateway.PushManyRequest) error {
-	ret := _m.ctrl.Call(_m, "PushMany", _param0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-func (_mr *_MockGitRecorder) PushMany(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "PushMany", arg0)
 }
 
 func (_m *MockGit) Rebase(_param0 *gateway.RebaseRequest) error {
