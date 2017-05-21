@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/abhinav/git-fu/gateway"
 
@@ -15,6 +16,8 @@ import (
 
 // Gateway is a git gateway.
 type Gateway struct {
+	mu sync.RWMutex
+
 	dir string
 }
 
@@ -57,6 +60,9 @@ func NewGateway(startDir string) (*Gateway, error) {
 
 // CurrentBranch determines the current branch name.
 func (g *Gateway) CurrentBranch() (string, error) {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+
 	out, err := g.output("rev-parse", "--abbrev-ref", "HEAD")
 	if err != nil {
 		return "", fmt.Errorf("could not determine current branch: %v", err)
@@ -66,6 +72,9 @@ func (g *Gateway) CurrentBranch() (string, error) {
 
 // DoesBranchExist checks if this branch exists locally.
 func (g *Gateway) DoesBranchExist(name string) bool {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+
 	err := g.cmd("show-ref", "--verify", "--quiet", "refs/heads/"+name).Run()
 	return err == nil
 }
@@ -73,6 +82,9 @@ func (g *Gateway) DoesBranchExist(name string) bool {
 // CreateBranch creates a branch with the given name and head but does not
 // check it out.
 func (g *Gateway) CreateBranch(name, head string) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	if err := g.cmd("branch", name, head).Run(); err != nil {
 		return fmt.Errorf("failed to create branch %q at ref %q: %v", name, head, err)
 	}
@@ -81,6 +93,9 @@ func (g *Gateway) CreateBranch(name, head string) error {
 
 // CreateBranchAndSwitch checks out a new branch with the given name and head.
 func (g *Gateway) CreateBranchAndSwitch(name, head string) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	if err := g.cmd("checkout", "-b", name, head).Run(); err != nil {
 		return fmt.Errorf("failed to create branch %q at ref %q: %v", name, head, err)
 	}
@@ -89,6 +104,9 @@ func (g *Gateway) CreateBranchAndSwitch(name, head string) error {
 
 // SHA1 gets the SHA1 hash for the given ref.
 func (g *Gateway) SHA1(ref string) (string, error) {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+
 	out, err := g.output("rev-parse", ref)
 	if err != nil {
 		return "", fmt.Errorf("could not resolve ref %q: %v", ref, err)
@@ -98,6 +116,9 @@ func (g *Gateway) SHA1(ref string) (string, error) {
 
 // DeleteBranch deletes the given branch.
 func (g *Gateway) DeleteBranch(name string) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	if err := g.cmd("branch", "-D", name).Run(); err != nil {
 		return fmt.Errorf("failed to delete branch %q: %v", name, err)
 	}
@@ -107,6 +128,9 @@ func (g *Gateway) DeleteBranch(name string) error {
 // DeleteRemoteTrackingBranch deletes the remote tracking branch with the
 // given name.
 func (g *Gateway) DeleteRemoteTrackingBranch(remote, name string) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	if err := g.cmd("branch", "-dr", remote+"/"+name).Run(); err != nil {
 		return fmt.Errorf("failed to delete remote tracking branch %q: %v", name, err)
 	}
@@ -115,6 +139,9 @@ func (g *Gateway) DeleteRemoteTrackingBranch(remote, name string) error {
 
 // Checkout checks the given branch out.
 func (g *Gateway) Checkout(name string) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	if err := g.cmd("checkout", name).Run(); err != nil {
 		err = fmt.Errorf("failed to checkout branch %q: %v", name, err)
 	}
@@ -123,6 +150,9 @@ func (g *Gateway) Checkout(name string) error {
 
 // Fetch a git ref
 func (g *Gateway) Fetch(req *gateway.FetchRequest) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	ref := req.RemoteRef
 	if req.LocalRef != "" {
 		ref = ref + ":" + req.LocalRef
@@ -136,6 +166,9 @@ func (g *Gateway) Fetch(req *gateway.FetchRequest) error {
 
 // Push a branch
 func (g *Gateway) Push(req *gateway.PushRequest) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	err := g.PushMany(&gateway.PushManyRequest{
 		Remote: req.Remote,
 		Force:  req.Force,
@@ -152,6 +185,9 @@ func (g *Gateway) PushMany(req *gateway.PushManyRequest) error {
 	if len(req.Refs) == 0 {
 		return nil
 	}
+
+	g.mu.Lock()
+	defer g.mu.Unlock()
 
 	args := append(make([]string, 0, len(req.Refs)+2), "push")
 	if req.Force {
@@ -174,6 +210,9 @@ func (g *Gateway) PushMany(req *gateway.PushManyRequest) error {
 
 // Pull pulls the given branch.
 func (g *Gateway) Pull(remote, name string) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	if err := g.cmd("pull", remote, name).Run(); err != nil {
 		return fmt.Errorf("failed to pull %q from %q: %v", name, remote, err)
 	}
@@ -182,6 +221,9 @@ func (g *Gateway) Pull(remote, name string) error {
 
 // ApplyPatches applies the given patch.
 func (g *Gateway) ApplyPatches(patches string) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	cmd := g.cmd("am")
 	cmd.Stdin = strings.NewReader(patches)
 	if err := cmd.Run(); err != nil {
@@ -192,6 +234,9 @@ func (g *Gateway) ApplyPatches(patches string) error {
 
 // Rebase a branch.
 func (g *Gateway) Rebase(req *gateway.RebaseRequest) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	var _args [5]string
 
 	args := append(_args[:0], "rebase")
@@ -216,6 +261,9 @@ func (g *Gateway) Rebase(req *gateway.RebaseRequest) error {
 
 // ResetBranch resets the given branch to the given head.
 func (g *Gateway) ResetBranch(branch, head string) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	curr, err := g.CurrentBranch()
 	if err != nil {
 		return fmt.Errorf("could not reset %q to %q: %v", branch, head, err)
@@ -235,6 +283,9 @@ func (g *Gateway) ResetBranch(branch, head string) error {
 
 // RemoteURL gets the URL for the given remote.
 func (g *Gateway) RemoteURL(name string) (string, error) {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+
 	out, err := g.output("remote", "get-url", name)
 	if err != nil {
 		return "", fmt.Errorf("failed to get URL for remote %q: %v", name, err)
