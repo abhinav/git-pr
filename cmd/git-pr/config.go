@@ -24,10 +24,10 @@ func newConfigBuilder(cb cli.ConfigBuilder) configBuilder {
 
 		return config{
 			Config: cfg,
-			Service: &pr.Service{
+			Service: pr.NewService(pr.ServiceConfig{
 				GitHub: cfg.GitHub(),
 				Git:    cfg.Git(),
-			},
+			}),
 		}, nil
 	}
 }

@@ -14,11 +14,11 @@ import (
 
 // Rebase a pull request and its dependencies.
 func (s *Service) Rebase(ctx context.Context, req *service.RebaseRequest) (_ *service.RebaseResponse, err error) {
-	if err := s.Git.Fetch(&gateway.FetchRequest{Remote: "origin"}); err != nil {
+	if err := s.git.Fetch(&gateway.FetchRequest{Remote: "origin"}); err != nil {
 		return nil, err
 	}
 
-	baseRef, err := s.Git.SHA1("origin/" + req.Base)
+	baseRef, err := s.git.SHA1("origin/" + req.Base)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (s *Service) Rebase(ctx context.Context, req *service.RebaseRequest) (_ *se
 	}
 	defer func() {
 		for _, r := range result {
-			err = multierr.Append(err, s.Git.DeleteBranch(r.LocalBranch))
+			err = multierr.Append(err, s.git.DeleteBranch(r.LocalBranch))
 		}
 	}()
 
@@ -46,7 +46,7 @@ func (s *Service) Rebase(ctx context.Context, req *service.RebaseRequest) (_ *se
 	)
 	for _, r := range result {
 		head := *r.PullRequest.Head
-		if sha, err := s.Git.SHA1(*head.Ref); err == nil {
+		if sha, err := s.git.SHA1(*head.Ref); err == nil {
 			if sha == *head.SHA {
 				branchesToReset = append(branchesToReset, *head.Ref)
 			} else {
@@ -56,7 +56,7 @@ func (s *Service) Rebase(ctx context.Context, req *service.RebaseRequest) (_ *se
 		pushRefs[r.LocalBranch] = *head.Ref
 	}
 
-	if err := s.Git.Push(&gateway.PushRequest{
+	if err := s.git.Push(&gateway.PushRequest{
 		Remote: "origin",
 		Force:  true,
 		Refs:   pushRefs,
@@ -66,7 +66,7 @@ func (s *Service) Rebase(ctx context.Context, req *service.RebaseRequest) (_ *se
 
 	var errors error
 	for _, br := range branchesToReset {
-		if err := s.Git.ResetBranch(br, "origin/"+br); err != nil {
+		if err := s.git.ResetBranch(br, "origin/"+br); err != nil {
 			errors = multierr.Append(errors, fmt.Errorf("failed to update branch %q: %v", br, err))
 		}
 	}
@@ -80,7 +80,7 @@ func (s *Service) Rebase(ctx context.Context, req *service.RebaseRequest) (_ *se
 			wg.Add(1)
 			go func(pr *github.PullRequest) {
 				defer wg.Done()
-				err := s.GitHub.SetPullRequestBase(ctx, *pr.Number, req.Base)
+				err := s.gh.SetPullRequestBase(ctx, *pr.Number, req.Base)
 				if err == nil {
 					return
 				}
@@ -112,20 +112,20 @@ func dryRebase(
 	baseRef string,
 	prs []*github.PullRequest,
 ) (_ []rebasedPullRequest, err error) {
-	baseBranch := uniqueBranchName(s.Git, "base-"+baseRef)
-	if err := s.Git.CreateBranch(baseBranch, baseRef); err != nil {
+	baseBranch := uniqueBranchName(s.git, "base-"+baseRef)
+	if err := s.git.CreateBranch(baseBranch, baseRef); err != nil {
 		return nil, fmt.Errorf("failed to create temporary branch: %v", err)
 	}
 	// Can't rely on branchesCreated because this should always be cleaned up
-	defer func() { err = multierr.Append(err, s.Git.DeleteBranch(baseBranch)) }()
+	defer func() { err = multierr.Append(err, s.git.DeleteBranch(baseBranch)) }()
 
 	// Rebase changes the current branch so we should restore it after we are
 	// done.
-	oldBranch, err := s.Git.CurrentBranch()
+	oldBranch, err := s.git.CurrentBranch()
 	if err != nil {
 		return nil, err
 	}
-	defer func() { err = multierr.Append(err, s.Git.Checkout(oldBranch)) }()
+	defer func() { err = multierr.Append(err, s.git.Checkout(oldBranch)) }()
 
 	var (
 		// List of temporary branches created locally. If we fail with an error,
@@ -142,26 +142,26 @@ func dryRebase(
 		// The operation failed for some reason. Clean up whatever we have
 		// created so far.
 		for _, br := range branchesCreated {
-			err = multierr.Append(err, s.Git.DeleteBranch(br))
+			err = multierr.Append(err, s.git.DeleteBranch(br))
 		}
 	}()
 
 	for _, pr := range prs {
 		// We don't own this branch so we can't rebase it.
-		if !s.GitHub.IsOwned(ctx, pr.Head) {
+		if !s.gh.IsOwned(ctx, pr.Head) {
 			// TODO: log or record which PRs are skipped
 			continue
 		}
 
-		prBranch := uniqueBranchName(s.Git, fmt.Sprintf("rebase-%v", *pr.Number))
-		if err := s.Git.CreateBranch(prBranch, *pr.Head.SHA); err != nil {
+		prBranch := uniqueBranchName(s.git, fmt.Sprintf("rebase-%v", *pr.Number))
+		if err := s.git.CreateBranch(prBranch, *pr.Head.SHA); err != nil {
 			errors = multierr.Append(errors, fmt.Errorf(
 				"could not find head %v for PR %v: %v", *pr.Head.SHA, *pr.HTMLURL, err))
 			continue
 		}
 		branchesCreated = append(branchesCreated, prBranch)
 
-		if err := s.Git.Rebase(&gateway.RebaseRequest{
+		if err := s.git.Rebase(&gateway.RebaseRequest{
 			Onto:   baseBranch,
 			From:   *pr.Base.SHA,
 			Branch: prBranch,
@@ -172,7 +172,7 @@ func dryRebase(
 		}
 		result = append(result, rebasedPullRequest{PullRequest: pr, LocalBranch: prBranch})
 
-		dependents, err := s.GitHub.ListPullRequestsByBase(ctx, *pr.Head.Ref)
+		dependents, err := s.gh.ListPullRequestsByBase(ctx, *pr.Head.Ref)
 		if err != nil {
 			errors = multierr.Append(errors, fmt.Errorf(
 				"could not get dependents of %v: %v", *pr.HTMLURL, err))

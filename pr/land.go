@@ -17,8 +17,8 @@ func (s *Service) Land(ctx context.Context, req *service.LandRequest) (*service.
 	// If the base branch doesn't exist locally, check it out. If it exists,
 	// it's okay for it to be out of sync with the remote.
 	base := *pr.Base.Ref
-	if !s.Git.DoesBranchExist(base) {
-		if err := s.Git.CreateBranch(base, *pr.Base.Ref); err != nil {
+	if !s.git.DoesBranchExist(base) {
+		if err := s.git.CreateBranch(base, *pr.Base.Ref); err != nil {
 			return nil, err
 		}
 	}
@@ -26,7 +26,7 @@ func (s *Service) Land(ctx context.Context, req *service.LandRequest) (*service.
 	// If the branch is checked out locally, make sure it's in sync with
 	// remote.
 	if req.LocalBranch != "" {
-		hash, err := s.Git.SHA1(req.LocalBranch)
+		hash, err := s.git.SHA1(req.LocalBranch)
 		if err != nil {
 			return nil, err
 		}
@@ -39,31 +39,31 @@ func (s *Service) Land(ctx context.Context, req *service.LandRequest) (*service.
 		}
 	}
 
-	if err := s.GitHub.SquashPullRequest(ctx, pr); err != nil {
+	if err := s.gh.SquashPullRequest(ctx, pr); err != nil {
 		return nil, err
 	}
 
-	if err := s.Git.Checkout(base); err != nil {
+	if err := s.git.Checkout(base); err != nil {
 		return nil, err
 	}
 
 	// TODO: Remove hard coded remote name
-	if err := s.Git.Pull("origin", base); err != nil {
+	if err := s.git.Pull("origin", base); err != nil {
 		return nil, err
 	}
 
 	if req.LocalBranch != "" {
-		if err := s.Git.DeleteBranch(req.LocalBranch); err != nil {
+		if err := s.git.DeleteBranch(req.LocalBranch); err != nil {
 			return nil, err
 		}
 	}
 
 	// Nothing else to do if we don't own this pull request.
-	if !s.GitHub.IsOwned(ctx, pr.Head) {
+	if !s.gh.IsOwned(ctx, pr.Head) {
 		return nil, nil
 	}
 
-	dependents, err := s.GitHub.ListPullRequestsByBase(ctx, *pr.Head.Ref)
+	dependents, err := s.gh.ListPullRequestsByBase(ctx, *pr.Head.Ref)
 	if err != nil {
 		return nil, err
 	}
@@ -79,13 +79,13 @@ func (s *Service) Land(ctx context.Context, req *service.LandRequest) (*service.
 
 	// TODO: What happens on branch deletion if we had dependents but none
 	// were owned by us?
-	if err := s.GitHub.DeleteBranch(ctx, *pr.Head.Ref); err != nil {
+	if err := s.gh.DeleteBranch(ctx, *pr.Head.Ref); err != nil {
 		return nil, err
 	}
 
 	if req.LocalBranch != "" {
 		// TODO: Remove hard coded remote name
-		if err := s.Git.DeleteRemoteTrackingBranch("origin", req.LocalBranch); err != nil {
+		if err := s.git.DeleteRemoteTrackingBranch("origin", req.LocalBranch); err != nil {
 			return nil, err
 		}
 	}
