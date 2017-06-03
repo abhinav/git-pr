@@ -50,6 +50,10 @@ type WalkConfig struct {
 // Errors encountered while visiting pull requests are collatted and presented
 // as one.
 func Walk(cfg WalkConfig, pulls []*github.PullRequest, v Visitor) error {
+	if cfg.Children == nil {
+		panic("WalkConfig.Children must be set")
+	}
+
 	if cfg.Concurrency <= 0 {
 		cfg.Concurrency = runtime.NumCPU()
 	}

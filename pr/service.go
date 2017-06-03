@@ -15,6 +15,9 @@ type ServiceConfig struct {
 type Service struct {
 	gh  gateway.GitHub
 	git gateway.Git
+
+	// Hidden option to customize how we rebase pull requests.
+	rebasePullRequests func(rebasePRConfig) (map[int]rebasedPullRequest, error)
 }
 
 // NewService builds a new PR service with the given configuration.
@@ -22,6 +25,7 @@ func NewService(cfg ServiceConfig) *Service {
 	return &Service{
 		gh:                 cfg.GitHub,
 		git:                cfg.Git,
+		rebasePullRequests: rebasePullRequests,
 	}
 }
 
