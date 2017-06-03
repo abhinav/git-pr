@@ -34,6 +34,9 @@ type LandResponse struct {
 type RebaseRequest struct {
 	PullRequests []*github.PullRequest
 	Base         string
+
+	// If non-empy, only pull requests by the given user will be rebased.
+	Author string
 }
 
 // RebaseResponse is the response of the Rebase operation.

@@ -164,10 +164,15 @@ func TestRebaseCmd(t *testing.T) {
 				},
 			},
 			ExpectRebaseRequest: &service.RebaseRequest{
+				Author: "foo",
 				PullRequests: []*github.PullRequest{
 					{
 						HTMLURL: ptr.String("x"),
 						User:    &github.User{Login: ptr.String("foo")},
+					},
+					{
+						HTMLURL: ptr.String("y"),
+						User:    &github.User{Login: ptr.String("bar")},
 					},
 					{
 						HTMLURL: ptr.String("z"),

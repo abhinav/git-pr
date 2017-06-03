@@ -50,6 +50,7 @@ func (s *Service) Rebase(ctx context.Context, req *service.RebaseRequest) (_ *se
 		GitHub:       s.gh,
 		Base:         baseRef,
 		PullRequests: req.PullRequests,
+		Author:       req.Author,
 	})
 	if err != nil {
 		return nil, err
@@ -143,6 +144,9 @@ type bulkRebaser interface {
 }
 
 type rebasePRConfig struct {
+	// If non-empty, only PRs authored by this user will be considered.
+	Author string
+
 	Context      context.Context
 	GitRebaser   bulkRebaser
 	GitHub       gateway.GitHub
@@ -199,6 +203,11 @@ func (v rebaseVisitor) Visit(pr *github.PullRequest) (Visitor, error) {
 		// TODO: There is more nuance to this. We should check if we have
 		// write access instead.
 		// TODO: Log if we skip
+		return nil, nil
+	}
+
+	if v.Author != "" && pr.User.GetLogin() != v.Author {
+		// TODO: log skipped PR
 		return nil, nil
 	}
 

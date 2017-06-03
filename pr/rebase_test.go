@@ -671,6 +671,7 @@ func TestRebasePullRequests(t *testing.T) {
 	type testCase struct {
 		Desc string
 
+		Author       string
 		Base         string
 		PullRequests []*github.PullRequest
 
@@ -678,7 +679,7 @@ func TestRebasePullRequests(t *testing.T) {
 		// part of the work is done by SetupGitHub.
 		Dependents map[string][]*github.PullRequest // base branch -> PRs
 
-		// Whether the given branches are owned by the current user or not.
+		// Whether the given branches are owned by the current repo or not.
 		// May be partial or empty if part of the work is done by SetupGitHub.
 		BranchOwnership map[string]bool
 
@@ -728,6 +729,29 @@ func TestRebasePullRequests(t *testing.T) {
 			tt.WantResults = []rebasedPullRequest{
 				{LocalRef: "newsha", PR: pr},
 			}
+
+			return
+		}(),
+		func() (tt testCase) {
+			tt.Desc = "single wrong author"
+
+			pr := &github.PullRequest{
+				Number:  github.Int(1),
+				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				Base: &github.PullRequestBranch{
+					SHA: github.String("basesha"),
+				},
+				User: &github.User{Login: github.String("probablynotarealusername")},
+				Head: &github.PullRequestBranch{
+					SHA: github.String("headsha"),
+					Ref: github.String("feature-1"),
+				},
+			}
+
+			tt.Author = "abhinav"
+			tt.Base = "origin/master"
+			tt.PullRequests = []*github.PullRequest{pr}
+			tt.BranchOwnership = map[string]bool{"feature-1": true}
 
 			return
 		}(),
@@ -952,6 +976,59 @@ func TestRebasePullRequests(t *testing.T) {
 
 			return
 		}(),
+		func() (tt testCase) {
+			tt.Desc = "stack partly wrong user"
+
+			pr1 := &github.PullRequest{
+				Number:  github.Int(1),
+				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				User:    &github.User{Login: github.String("abhinav")},
+				Base: &github.PullRequestBranch{
+					SHA: github.String("mastersha"),
+				},
+				Head: &github.PullRequestBranch{
+					SHA: github.String("sha1"),
+					Ref: github.String("feature-1"),
+				},
+			}
+
+			pr2 := &github.PullRequest{
+				Number:  github.Int(2),
+				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/2"),
+				User:    &github.User{Login: github.String("probablynotarealusername")},
+				Base: &github.PullRequestBranch{
+					SHA: github.String("sha1"),
+				},
+				Head: &github.PullRequestBranch{
+					SHA: github.String("sha2"),
+					Ref: github.String("feature-2"),
+				},
+			}
+
+			tt.Author = "abhinav"
+			tt.Base = "origin/master"
+			tt.PullRequests = []*github.PullRequest{pr1}
+			tt.Dependents = map[string][]*github.PullRequest{
+				"feature-1": []*github.PullRequest{pr2},
+			}
+			tt.BranchOwnership = map[string]bool{
+				"feature-1": true,
+				"feature-2": true,
+			}
+
+			tt.WantRebases = []fakeRebase{
+				{
+					FromRef: "mastersha",
+					ToRef:   "sha1",
+					GiveRef: "newsha1",
+				},
+			}
+			tt.WantResults = []rebasedPullRequest{
+				{LocalRef: "newsha1", PR: pr1},
+			}
+
+			return
+		}(),
 	}
 
 	for _, tt := range tests {
@@ -990,6 +1067,7 @@ func TestRebasePullRequests(t *testing.T) {
 				Context:      ctx,
 				GitRebaser:   rebaser,
 				GitHub:       gh,
+				Author:       tt.Author,
 				Base:         tt.Base,
 				PullRequests: tt.PullRequests,
 			})

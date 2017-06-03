@@ -69,13 +69,7 @@ func (r *rebaseCmd) Execute([]string) error {
 	}
 
 	if r.OnlyMine {
-		prs := req.PullRequests[:0]
-		for _, pr := range req.PullRequests {
-			if pr.User.GetLogin() == cfg.CurrentGitHubUser() {
-				prs = append(prs, pr)
-			}
-		}
-		req.PullRequests = prs
+		req.Author = cfg.CurrentGitHubUser()
 	}
 
 	log.Println("Rebasing:")
