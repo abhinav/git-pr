@@ -109,7 +109,7 @@ func (g *Gateway) SHA1(ref string) (string, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
-	out, err := g.output("rev-parse", ref)
+	out, err := g.output("rev-parse", "--verify", "-q", ref)
 	if err != nil {
 		return "", fmt.Errorf("could not resolve ref %q: %v", ref, err)
 	}
