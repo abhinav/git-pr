@@ -1,7 +1,7 @@
 Releases
 ========
 
-v0.5.0 (unreleased)
+v0.5.0 (2017-06-21)
 -------------------
 
 -   `git pr rebase` now supports an `--only-mine` flag to rebase only pull
