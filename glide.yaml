@@ -1,4 +1,4 @@
-package: github.com/abhinav/git-fu
+package: github.com/abhinav/git-pr
 import:
 - package: github.com/google/go-github
   version: master

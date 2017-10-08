@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/abhinav/git-fu/pr"
-	"github.com/abhinav/git-fu/pr/prtest"
+	"github.com/abhinav/git-pr/pr"
+	"github.com/abhinav/git-pr/pr/prtest"
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/go-github/github"

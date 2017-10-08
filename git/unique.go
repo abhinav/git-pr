@@ -3,7 +3,7 @@ package git
 import (
 	"fmt"
 
-	"github.com/abhinav/git-fu/gateway"
+	"github.com/abhinav/git-pr/gateway"
 )
 
 const _uniqeBranchAttempts = 10

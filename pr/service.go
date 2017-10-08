@@ -1,8 +1,8 @@
 package pr
 
 import (
-	"github.com/abhinav/git-fu/gateway"
-	"github.com/abhinav/git-fu/service"
+	"github.com/abhinav/git-pr/gateway"
+	"github.com/abhinav/git-pr/service"
 )
 
 // ServiceConfig specifies the different parameters for a PR service.

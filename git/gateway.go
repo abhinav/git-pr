@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/abhinav/git-fu/gateway"
+	"github.com/abhinav/git-pr/gateway"
 
 	"go.uber.org/multierr"
 )

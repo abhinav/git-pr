@@ -1,9 +1,9 @@
 package clitest
 
 import (
-	"github.com/abhinav/git-fu/cli"
-	"github.com/abhinav/git-fu/gateway"
-	"github.com/abhinav/git-fu/repo"
+	"github.com/abhinav/git-pr/cli"
+	"github.com/abhinav/git-pr/gateway"
+	"github.com/abhinav/git-pr/repo"
 )
 
 // ConfigBuilder may be used to build a cli.Config from static values.

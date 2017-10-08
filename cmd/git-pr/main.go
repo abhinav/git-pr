@@ -1,6 +1,6 @@
 package main
 
-import "github.com/abhinav/git-fu/cli"
+import "github.com/abhinav/git-pr/cli"
 
 func main() {
 	cli.Main(

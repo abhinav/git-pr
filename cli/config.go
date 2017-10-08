@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/abhinav/git-fu/gateway"
-	"github.com/abhinav/git-fu/git"
-	"github.com/abhinav/git-fu/github"
-	"github.com/abhinav/git-fu/repo"
+	"github.com/abhinav/git-pr/gateway"
+	"github.com/abhinav/git-pr/git"
+	"github.com/abhinav/git-pr/github"
+	"github.com/abhinav/git-pr/repo"
 
 	gh "github.com/google/go-github/github"
 	"github.com/zalando/go-keyring"

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/abhinav/git-fu/cli"
-	"github.com/abhinav/git-fu/editor"
-	"github.com/abhinav/git-fu/service"
+	"github.com/abhinav/git-pr/cli"
+	"github.com/abhinav/git-pr/editor"
+	"github.com/abhinav/git-pr/service"
 
 	"github.com/google/go-github/github"
 	"github.com/jessevdk/go-flags"

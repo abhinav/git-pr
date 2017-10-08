@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abhinav/git-fu/gateway"
-	"github.com/abhinav/git-fu/gateway/gatewaytest"
-	"github.com/abhinav/git-fu/git"
-	"github.com/abhinav/git-fu/git/gittest"
-	"github.com/abhinav/git-fu/service"
+	"github.com/abhinav/git-pr/gateway"
+	"github.com/abhinav/git-pr/gateway/gatewaytest"
+	"github.com/abhinav/git-pr/git"
+	"github.com/abhinav/git-pr/git/gittest"
+	"github.com/abhinav/git-pr/service"
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/go-github/github"
@@ -74,7 +74,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("master"),
 				},
@@ -89,11 +89,11 @@ func TestServiceRebase(t *testing.T) {
 				PullRequests: []*github.PullRequest{pr},
 			}
 			tt.RebasePRsResult = []rebasedPullRequest{
-				{PR: pr, LocalRef: "git-fu/rebase/headsha"},
+				{PR: pr, LocalRef: "git-pr/rebase/headsha"},
 			}
 			tt.SHA1Hashes = map[string]string{"myfeature": "headsha"}
 
-			tt.WantPushes = map[string]string{"git-fu/rebase/headsha": "myfeature"}
+			tt.WantPushes = map[string]string{"git-pr/rebase/headsha": "myfeature"}
 			tt.WantBranchResets = []string{"myfeature"}
 
 			return
@@ -105,7 +105,7 @@ func TestServiceRebase(t *testing.T) {
 				PullRequests: []*github.PullRequest{
 					&github.PullRequest{
 						Number:  github.Int(1),
-						HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+						HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 						Base: &github.PullRequestBranch{
 							Ref: github.String("master"),
 						},
@@ -123,7 +123,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("dev"),
 				},
@@ -138,11 +138,11 @@ func TestServiceRebase(t *testing.T) {
 				PullRequests: []*github.PullRequest{pr},
 			}
 			tt.RebasePRsResult = []rebasedPullRequest{
-				{PR: pr, LocalRef: "git-fu/rebase/somesha"},
+				{PR: pr, LocalRef: "git-pr/rebase/somesha"},
 			}
 			tt.SHA1Hashes = map[string]string{"myfeature": "differentsha"}
 
-			tt.WantPushes = map[string]string{"git-fu/rebase/somesha": "myfeature"}
+			tt.WantPushes = map[string]string{"git-pr/rebase/somesha": "myfeature"}
 			tt.WantBaseChanges = []int{1}
 			tt.WantResponse = service.RebaseResponse{
 				BranchesNotUpdated: []string{"myfeature"},
@@ -155,7 +155,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr1 := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("dev"),
 				},
@@ -167,7 +167,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr2 := &github.PullRequest{
 				Number:  github.Int(2),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/2"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/2"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("master"),
 				},
@@ -179,7 +179,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr3 := &github.PullRequest{
 				Number:  github.Int(3),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/3"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/3"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("master"),
 				},
@@ -194,9 +194,9 @@ func TestServiceRebase(t *testing.T) {
 				PullRequests: []*github.PullRequest{pr1, pr2, pr3},
 			}
 			tt.RebasePRsResult = []rebasedPullRequest{
-				{PR: pr1, LocalRef: "git-fu/rebase/sha1"},
-				{PR: pr2, LocalRef: "git-fu/rebase/sha2"},
-				{PR: pr3, LocalRef: "git-fu/rebase/sha3"},
+				{PR: pr1, LocalRef: "git-pr/rebase/sha1"},
+				{PR: pr2, LocalRef: "git-pr/rebase/sha2"},
+				{PR: pr3, LocalRef: "git-pr/rebase/sha3"},
 			}
 			tt.SHA1Hashes = map[string]string{
 				"feature-1": "sha1",
@@ -204,9 +204,9 @@ func TestServiceRebase(t *testing.T) {
 				"feature-3": "not-sha3",
 			}
 			tt.WantPushes = map[string]string{
-				"git-fu/rebase/sha1": "feature-1",
-				"git-fu/rebase/sha2": "feature-2",
-				"git-fu/rebase/sha3": "feature-3",
+				"git-pr/rebase/sha1": "feature-1",
+				"git-pr/rebase/sha2": "feature-2",
+				"git-pr/rebase/sha3": "feature-3",
 			}
 			tt.WantBaseChanges = []int{2, 3}
 			tt.WantBranchResets = []string{"feature-1", "feature-2"}
@@ -223,7 +223,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("dev"),
 				},
@@ -238,12 +238,12 @@ func TestServiceRebase(t *testing.T) {
 				PullRequests: []*github.PullRequest{pr},
 			}
 			tt.RebasePRsResult = []rebasedPullRequest{
-				{PR: pr, LocalRef: "git-fu/rebase/sha1"},
+				{PR: pr, LocalRef: "git-pr/rebase/sha1"},
 				{
-					LocalRef: "git-fu/rebase/sha2",
+					LocalRef: "git-pr/rebase/sha2",
 					PR: &github.PullRequest{
 						Number:  github.Int(2),
-						HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/2"),
+						HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/2"),
 						Base: &github.PullRequestBranch{
 							Ref: github.String("feature-1"),
 						},
@@ -254,10 +254,10 @@ func TestServiceRebase(t *testing.T) {
 					},
 				},
 				{
-					LocalRef: "git-fu/rebase/sha3",
+					LocalRef: "git-pr/rebase/sha3",
 					PR: &github.PullRequest{
 						Number:  github.Int(3),
-						HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/3"),
+						HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/3"),
 						Base: &github.PullRequestBranch{
 							Ref: github.String("feature-2"),
 						},
@@ -277,9 +277,9 @@ func TestServiceRebase(t *testing.T) {
 
 			tt.WantBranchResets = []string{"feature-3"}
 			tt.WantPushes = map[string]string{
-				"git-fu/rebase/sha1": "feature-1",
-				"git-fu/rebase/sha2": "feature-2",
-				"git-fu/rebase/sha3": "feature-3",
+				"git-pr/rebase/sha1": "feature-1",
+				"git-pr/rebase/sha2": "feature-2",
+				"git-pr/rebase/sha3": "feature-3",
 			}
 			tt.WantResponse = service.RebaseResponse{
 				BranchesNotUpdated: []string{"feature-1"},
@@ -300,7 +300,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr1 := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("dev"),
 				},
@@ -312,7 +312,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr2 := &github.PullRequest{
 				Number:  github.Int(2),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/2"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/2"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("master"),
 				},
@@ -327,13 +327,13 @@ func TestServiceRebase(t *testing.T) {
 				PullRequests: []*github.PullRequest{pr1, pr2},
 			}
 			tt.RebasePRsResult = []rebasedPullRequest{
-				{PR: pr1, LocalRef: "git-fu/rebase/sha1"},
-				{PR: pr2, LocalRef: "git-fu/rebase/sha2"},
+				{PR: pr1, LocalRef: "git-pr/rebase/sha1"},
+				{PR: pr2, LocalRef: "git-pr/rebase/sha2"},
 				{
-					LocalRef: "git-fu/rebase/sha3",
+					LocalRef: "git-pr/rebase/sha3",
 					PR: &github.PullRequest{
 						Number:  github.Int(3),
-						HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/3"),
+						HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/3"),
 						Base: &github.PullRequestBranch{
 							Ref: github.String("feature-2"),
 						},
@@ -344,10 +344,10 @@ func TestServiceRebase(t *testing.T) {
 					},
 				},
 				{
-					LocalRef: "git-fu/rebase/sha4",
+					LocalRef: "git-pr/rebase/sha4",
 					PR: &github.PullRequest{
 						Number:  github.Int(4),
-						HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/4"),
+						HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/4"),
 						Base: &github.PullRequestBranch{
 							Ref: github.String("feature-1"),
 						},
@@ -358,10 +358,10 @@ func TestServiceRebase(t *testing.T) {
 					},
 				},
 				{
-					LocalRef: "git-fu/rebase/sha5",
+					LocalRef: "git-pr/rebase/sha5",
 					PR: &github.PullRequest{
 						Number:  github.Int(5),
-						HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/5"),
+						HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/5"),
 						Base: &github.PullRequestBranch{
 							Ref: github.String("feature-2"),
 						},
@@ -372,10 +372,10 @@ func TestServiceRebase(t *testing.T) {
 					},
 				},
 				{
-					LocalRef: "git-fu/rebase/sha6",
+					LocalRef: "git-pr/rebase/sha6",
 					PR: &github.PullRequest{
 						Number:  github.Int(6),
-						HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/6"),
+						HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/6"),
 						Base: &github.PullRequestBranch{
 							Ref: github.String("feature-5"),
 						},
@@ -397,12 +397,12 @@ func TestServiceRebase(t *testing.T) {
 
 			tt.WantBranchResets = []string{"feature-1", "feature-5"}
 			tt.WantPushes = map[string]string{
-				"git-fu/rebase/sha1": "feature-1",
-				"git-fu/rebase/sha2": "feature-2",
-				"git-fu/rebase/sha3": "feature-3",
-				"git-fu/rebase/sha4": "feature-4",
-				"git-fu/rebase/sha5": "feature-5",
-				"git-fu/rebase/sha6": "feature-6",
+				"git-pr/rebase/sha1": "feature-1",
+				"git-pr/rebase/sha2": "feature-2",
+				"git-pr/rebase/sha3": "feature-3",
+				"git-pr/rebase/sha4": "feature-4",
+				"git-pr/rebase/sha5": "feature-5",
+				"git-pr/rebase/sha6": "feature-6",
 			}
 			tt.WantBaseChanges = []int{2}
 			tt.WantResponse = service.RebaseResponse{
@@ -480,7 +480,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("master"),
 				},
@@ -495,7 +495,7 @@ func TestServiceRebase(t *testing.T) {
 				PullRequests: []*github.PullRequest{pr},
 			}
 			tt.RebasePRsResult = []rebasedPullRequest{
-				{PR: pr, LocalRef: "git-fu/rebase/headsha"},
+				{PR: pr, LocalRef: "git-pr/rebase/headsha"},
 			}
 			tt.SHA1Hashes = map[string]string{"myfeature": "headsha"}
 
@@ -512,7 +512,7 @@ func TestServiceRebase(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					Ref: github.String("master"),
 				},
@@ -527,11 +527,11 @@ func TestServiceRebase(t *testing.T) {
 				PullRequests: []*github.PullRequest{pr},
 			}
 			tt.RebasePRsResult = []rebasedPullRequest{
-				{PR: pr, LocalRef: "git-fu/rebase/headsha"},
+				{PR: pr, LocalRef: "git-pr/rebase/headsha"},
 			}
 			tt.SHA1Hashes = map[string]string{"myfeature": "headsha"}
 
-			tt.WantPushes = map[string]string{"git-fu/rebase/headsha": "myfeature"}
+			tt.WantPushes = map[string]string{"git-pr/rebase/headsha": "myfeature"}
 			tt.WantBranchResets = []string{"myfeature"}
 
 			tt.SetupGitHub = func(gh *gatewaytest.MockGitHub) {
@@ -703,7 +703,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("basesha"),
 				},
@@ -737,7 +737,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("basesha"),
 				},
@@ -760,7 +760,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("basesha"),
 				},
@@ -796,7 +796,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("basesha"),
 				},
@@ -829,7 +829,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("basesha"),
 				},
@@ -854,7 +854,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr1 := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("mastersha"),
 				},
@@ -866,7 +866,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr2 := &github.PullRequest{
 				Number:  github.Int(2),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/2"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/2"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("sha1"),
 				},
@@ -878,7 +878,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr3 := &github.PullRequest{
 				Number:  github.Int(3),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/3"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/3"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("sha2"),
 				},
@@ -931,7 +931,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr1 := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("mastersha"),
 				},
@@ -943,7 +943,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr2 := &github.PullRequest{
 				Number:  github.Int(2),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/2"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/2"),
 				Base: &github.PullRequestBranch{
 					SHA: github.String("sha1"),
 				},
@@ -981,7 +981,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr1 := &github.PullRequest{
 				Number:  github.Int(1),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/1"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/1"),
 				User:    &github.User{Login: github.String("abhinav")},
 				Base: &github.PullRequestBranch{
 					SHA: github.String("mastersha"),
@@ -994,7 +994,7 @@ func TestRebasePullRequests(t *testing.T) {
 
 			pr2 := &github.PullRequest{
 				Number:  github.Int(2),
-				HTMLURL: github.String("http://github.com/abhinav/git-fu/pulls/2"),
+				HTMLURL: github.String("http://github.com/abhinav/git-pr/pulls/2"),
 				User:    &github.User{Login: github.String("probablynotarealusername")},
 				Base: &github.PullRequestBranch{
 					SHA: github.String("sha1"),

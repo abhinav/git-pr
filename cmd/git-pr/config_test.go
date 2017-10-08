@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/abhinav/git-fu/cli/clitest"
-	"github.com/abhinav/git-fu/service"
+	"github.com/abhinav/git-pr/cli/clitest"
+	"github.com/abhinav/git-pr/service"
 )
 
 type fakeConfigBuilder struct {

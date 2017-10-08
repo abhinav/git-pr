@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/abhinav/git-fu/gateway"
-	"github.com/abhinav/git-fu/git"
-	"github.com/abhinav/git-fu/service"
+	"github.com/abhinav/git-pr/gateway"
+	"github.com/abhinav/git-pr/git"
+	"github.com/abhinav/git-pr/service"
 
 	"github.com/google/go-github/github"
 	"go.uber.org/multierr"

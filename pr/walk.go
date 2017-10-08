@@ -24,7 +24,7 @@ type Visitor interface {
 	Visit(*github.PullRequest) (Visitor, error)
 }
 
-//go:generate mockgen -package=prtest -destination=prtest/mocks.go github.com/abhinav/git-fu/pr Visitor
+//go:generate mockgen -package=prtest -destination=prtest/mocks.go github.com/abhinav/git-pr/pr Visitor
 
 // WalkConfig configures a pull request traversal.
 type WalkConfig struct {

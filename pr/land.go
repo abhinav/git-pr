@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/abhinav/git-fu/service"
+	"github.com/abhinav/git-pr/service"
 )
 
 // Land the given pull request.

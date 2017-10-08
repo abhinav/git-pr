@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/abhinav/git-fu/gateway"
+	"github.com/abhinav/git-pr/gateway"
 	"github.com/stretchr/testify/require"
 )
 

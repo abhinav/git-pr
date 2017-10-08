@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/abhinav/git-fu/cli"
-	"github.com/abhinav/git-fu/service"
+	"github.com/abhinav/git-pr/cli"
+	"github.com/abhinav/git-pr/service"
 
 	"github.com/jessevdk/go-flags"
 )

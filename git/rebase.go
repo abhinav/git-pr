@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/abhinav/git-fu/gateway"
+	"github.com/abhinav/git-pr/gateway"
 
 	"go.uber.org/multierr"
 )
@@ -64,7 +64,7 @@ type temporaryBranch struct {
 }
 
 func (br *BulkRebaser) checkoutTemporaryBranch(parent, ref string) (string, error) {
-	name, err := br.checkoutUniqueBranch(br.git, fmt.Sprintf("git-fu/rebase/%v", ref), ref)
+	name, err := br.checkoutUniqueBranch(br.git, fmt.Sprintf("git-pr/rebase/%v", ref), ref)
 	if err != nil {
 		br.recordError(err)
 		return name, err

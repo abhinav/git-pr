@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/abhinav/git-fu/gateway"
-	"github.com/abhinav/git-fu/gateway/gatewaytest"
+	"github.com/abhinav/git-pr/gateway"
+	"github.com/abhinav/git-pr/gateway/gatewaytest"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -59,7 +59,7 @@ func TestBulkRebaser(t *testing.T) {
 						{
 							From:     "feature-1",
 							To:       "feature-2",
-							WantBase: "git-fu/rebase/feature-2",
+							WantBase: "git-pr/rebase/feature-2",
 						},
 					},
 				},
@@ -68,11 +68,11 @@ func TestBulkRebaser(t *testing.T) {
 				{
 					Onto:   "master",
 					From:   "feature-1",
-					Branch: "git-fu/rebase/feature-2",
+					Branch: "git-pr/rebase/feature-2",
 				},
 			},
 			ExpectDeletions: []deletion{
-				{Checkout: "master", Delete: "git-fu/rebase/feature-2"},
+				{Checkout: "master", Delete: "git-pr/rebase/feature-2"},
 			},
 		},
 		{
@@ -84,22 +84,22 @@ func TestBulkRebaser(t *testing.T) {
 						{
 							From:     "dev",
 							To:       "feature-1",
-							WantBase: "git-fu/rebase/feature-1",
+							WantBase: "git-pr/rebase/feature-1",
 						},
 						{
 							From:     "feature-1",
 							To:       "feature-2",
-							WantBase: "git-fu/rebase/feature-2",
+							WantBase: "git-pr/rebase/feature-2",
 						},
 						{
 							From:     "feature-2",
 							To:       "feature-3",
-							WantBase: "git-fu/rebase/feature-3",
+							WantBase: "git-pr/rebase/feature-3",
 						},
 						{
 							From:     "feature-3",
 							To:       "feature-4",
-							WantBase: "git-fu/rebase/feature-4",
+							WantBase: "git-pr/rebase/feature-4",
 						},
 					},
 				},
@@ -108,40 +108,40 @@ func TestBulkRebaser(t *testing.T) {
 				{
 					Onto:   "origin/dev",
 					From:   "dev",
-					Branch: "git-fu/rebase/feature-1",
+					Branch: "git-pr/rebase/feature-1",
 				},
 				{
-					Onto:   "git-fu/rebase/feature-1",
+					Onto:   "git-pr/rebase/feature-1",
 					From:   "feature-1",
-					Branch: "git-fu/rebase/feature-2",
+					Branch: "git-pr/rebase/feature-2",
 				},
 				{
-					Onto:   "git-fu/rebase/feature-2",
+					Onto:   "git-pr/rebase/feature-2",
 					From:   "feature-2",
-					Branch: "git-fu/rebase/feature-3",
+					Branch: "git-pr/rebase/feature-3",
 				},
 				{
-					Onto:   "git-fu/rebase/feature-3",
+					Onto:   "git-pr/rebase/feature-3",
 					From:   "feature-3",
-					Branch: "git-fu/rebase/feature-4",
+					Branch: "git-pr/rebase/feature-4",
 				},
 			},
 			ExpectDeletions: []deletion{
 				{
-					Checkout: "git-fu/rebase/feature-3",
-					Delete:   "git-fu/rebase/feature-4",
+					Checkout: "git-pr/rebase/feature-3",
+					Delete:   "git-pr/rebase/feature-4",
 				},
 				{
-					Checkout: "git-fu/rebase/feature-2",
-					Delete:   "git-fu/rebase/feature-3",
+					Checkout: "git-pr/rebase/feature-2",
+					Delete:   "git-pr/rebase/feature-3",
 				},
 				{
-					Checkout: "git-fu/rebase/feature-1",
-					Delete:   "git-fu/rebase/feature-2",
+					Checkout: "git-pr/rebase/feature-1",
+					Delete:   "git-pr/rebase/feature-2",
 				},
 				{
 					Checkout: "origin/dev",
-					Delete:   "git-fu/rebase/feature-1",
+					Delete:   "git-pr/rebase/feature-1",
 				},
 			},
 		},
@@ -174,7 +174,7 @@ func TestBulkRebaser(t *testing.T) {
 						{
 							From:     "feature-3",
 							To:       "feature-4",
-							WantBase: "git-fu/rebase/feature-4",
+							WantBase: "git-pr/rebase/feature-4",
 						},
 					},
 				},
@@ -183,7 +183,7 @@ func TestBulkRebaser(t *testing.T) {
 				{
 					Onto:   "origin/master",
 					From:   "feature-3",
-					Branch: "git-fu/rebase/feature-4",
+					Branch: "git-pr/rebase/feature-4",
 				},
 			},
 			SetupGateway: func(git *gatewaytest.MockGit) {
@@ -191,13 +191,13 @@ func TestBulkRebaser(t *testing.T) {
 					Rebase(&gateway.RebaseRequest{
 						Onto:   "origin/master",
 						From:   "master",
-						Branch: "git-fu/rebase/feature-1",
+						Branch: "git-pr/rebase/feature-1",
 					}).
 					Return(errors.New("great sadness"))
 			},
 			ExpectDeletions: []deletion{
-				{Checkout: "origin/master", Delete: "git-fu/rebase/feature-4"},
-				{Checkout: "origin/master", Delete: "git-fu/rebase/feature-1"},
+				{Checkout: "origin/master", Delete: "git-pr/rebase/feature-4"},
+				{Checkout: "origin/master", Delete: "git-pr/rebase/feature-1"},
 			},
 			WantErrors: []string{"great sadness"},
 		},
@@ -240,7 +240,7 @@ func TestBulkRebaser(t *testing.T) {
 					Rebase(&gateway.RebaseRequest{
 						Onto:   "origin/master",
 						From:   "master",
-						Branch: "git-fu/rebase/feature-1",
+						Branch: "git-pr/rebase/feature-1",
 					}).
 					Return(errors.New("feature 1 failed"))
 
@@ -248,7 +248,7 @@ func TestBulkRebaser(t *testing.T) {
 					Rebase(&gateway.RebaseRequest{
 						Onto:   "origin/master",
 						From:   "feature-1",
-						Branch: "git-fu/rebase/feature-2",
+						Branch: "git-pr/rebase/feature-2",
 					}).
 					Return(errors.New("feature 2 failed"))
 
@@ -256,14 +256,14 @@ func TestBulkRebaser(t *testing.T) {
 					Rebase(&gateway.RebaseRequest{
 						Onto:   "origin/master",
 						From:   "feature-2",
-						Branch: "git-fu/rebase/feature-3",
+						Branch: "git-pr/rebase/feature-3",
 					}).
 					Return(errors.New("feature 3 failed"))
 			},
 			ExpectDeletions: []deletion{
-				{Checkout: "origin/master", Delete: "git-fu/rebase/feature-3"},
-				{Checkout: "origin/master", Delete: "git-fu/rebase/feature-2"},
-				{Checkout: "origin/master", Delete: "git-fu/rebase/feature-1"},
+				{Checkout: "origin/master", Delete: "git-pr/rebase/feature-3"},
+				{Checkout: "origin/master", Delete: "git-pr/rebase/feature-2"},
+				{Checkout: "origin/master", Delete: "git-pr/rebase/feature-1"},
 			},
 			WantErrors: []string{
 				"feature 1 failed",

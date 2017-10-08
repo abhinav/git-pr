@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/abhinav/git-fu/gateway"
-	"github.com/abhinav/git-fu/repo"
+	"github.com/abhinav/git-pr/gateway"
+	"github.com/abhinav/git-pr/repo"
 
 	"github.com/google/go-github/github"
 )
 
-//go:generate mockgen -package github -destination=mocks_test.go github.com/abhinav/git-fu/github GitService,PullRequestsService
+//go:generate mockgen -package github -destination=mocks_test.go github.com/abhinav/git-pr/github GitService,PullRequestsService
 
 // GitService is a subset of the GitHub Git API.
 type GitService interface {

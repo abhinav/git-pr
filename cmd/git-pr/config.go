@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/abhinav/git-fu/cli"
-	"github.com/abhinav/git-fu/pr"
-	"github.com/abhinav/git-fu/service"
+	"github.com/abhinav/git-pr/cli"
+	"github.com/abhinav/git-pr/pr"
+	"github.com/abhinav/git-pr/service"
 )
 
 // Common config for git-pr commands.

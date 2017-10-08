@@ -3,14 +3,14 @@ package main
 import (
 	"testing"
 
-	"github.com/abhinav/git-fu/cli/clitest"
-	"github.com/abhinav/git-fu/editor"
-	"github.com/abhinav/git-fu/editor/editortest"
-	"github.com/abhinav/git-fu/gateway/gatewaytest"
-	"github.com/abhinav/git-fu/ptr"
-	"github.com/abhinav/git-fu/repo"
-	"github.com/abhinav/git-fu/service"
-	"github.com/abhinav/git-fu/service/servicetest"
+	"github.com/abhinav/git-pr/cli/clitest"
+	"github.com/abhinav/git-pr/editor"
+	"github.com/abhinav/git-pr/editor/editortest"
+	"github.com/abhinav/git-pr/gateway/gatewaytest"
+	"github.com/abhinav/git-pr/ptr"
+	"github.com/abhinav/git-pr/repo"
+	"github.com/abhinav/git-pr/service"
+	"github.com/abhinav/git-pr/service/servicetest"
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/go-github/github"

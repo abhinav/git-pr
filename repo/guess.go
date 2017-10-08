@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/abhinav/git-fu/gateway"
+	"github.com/abhinav/git-pr/gateway"
 )
 
 var _prefixes = []string{

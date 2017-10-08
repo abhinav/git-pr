@@ -19,7 +19,7 @@ build() {
 	os="$1"
 	arch="$2"
 	releasedir="releases/${os}_${arch}"
-	tarname="git-fu.$VERSION.$os.$arch.tar"
+	tarname="git-pr.$VERSION.$os.$arch.tar"
 
 	mkdir -p "$releasedir"
 	for cmd in "${CMDS[@]}"; do

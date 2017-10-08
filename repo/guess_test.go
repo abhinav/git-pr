@@ -3,7 +3,7 @@ package repo
 import (
 	"testing"
 
-	"github.com/abhinav/git-fu/gateway/gatewaytest"
+	"github.com/abhinav/git-pr/gateway/gatewaytest"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"

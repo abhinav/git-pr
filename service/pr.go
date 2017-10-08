@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/abhinav/git-fu/editor"
+	"github.com/abhinav/git-pr/editor"
 
 	"github.com/google/go-github/github"
 )

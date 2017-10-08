@@ -1,5 +1,5 @@
-This repository is intended to contain tools to make my GitHub workflow easier.
-Documentation and tests are lacking at this time.
+git-pr attempts to make managing multiple interdependent GitHub pull requests
+easier.
 
 Installation
 ============
@@ -8,35 +8,30 @@ Binaries
 --------
 
 Pre-built 64-bit binaries are available for Linux and Mac at
-<https://github.com/abhinav/git-fu/releases>. To install, simply unpack the
+<https://github.com/abhinav/git-pr/releases>. To install, simply unpack the
 archive and put the binaries somewhere on your `$PATH`.
 
 For example, if you have `$HOME/bin` on your `$PATH`,
 
     OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-    VERSION=v0.5.0
-    URL="https://github.com/abhinav/git-fu/releases/download/$VERSION/git-fu.$VERSION.$OS.amd64.tar.gz"
+    VERSION=v0.6.0
+    URL="https://github.com/abhinav/git-pr/releases/download/$VERSION/git-pr.$VERSION.$OS.amd64.tar.gz"
     curl -L "$URL" | tar xv -C ~/bin
 
 Build From Source
 -----------------
 
 If you have Go installed and set up, use the following command to build
-`git-fu` from source.
+`git-pr` from source.
 
-    go get github.com/abhinav/git-fu/cmd/...
+    go get github.com/abhinav/git-pr/cmd/git-pr
 
 Commands
 ========
 
-The following commands have been implemented so far.
-
-`git-pr`
---------
-
 The following subcommands are provided:
 
-### `land`
+## `land`
 
 ```
 git pr land
@@ -92,7 +87,7 @@ Will result in,
 
       master'' = master' + feature1
 
-### `rebase`
+## `rebase`
 
 ```
 git pr rebase --onto master
@@ -133,12 +128,6 @@ achieved with,
 
     $ git checkout master
     $ git pr rebase
-
-Code organization
-=================
-
--   Each standalone command will go under cmd/
--   Shared library functions will stay at the top-level
 
 Stability
 =========
